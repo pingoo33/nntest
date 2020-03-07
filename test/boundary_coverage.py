@@ -34,9 +34,10 @@ class BoundaryCoverage(Coverage):
             self.min_frequency_dict[index] = 0
 
     def calculate_coverage(self):
-        total_number_neurons = self.layer.output_shape[-1] * 2
+        size = self.layer.output_shape[-1]
+        total_number_neurons = size * 2
         covered_number_neurons = 0
-        for index in range(total_number_neurons):
+        for index in range(size):
             if self.max_covered_dict[index] is True:
                 covered_number_neurons += 1
             if self.min_covered_dict[index] is True:
