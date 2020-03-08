@@ -6,6 +6,7 @@ from data.temperature_distribution import TemperatureDistribution
 from model.temperature import Temperature
 from model.threshold_manager import ThresholdManager
 from test.boundary_coverage import BoundaryCoverage
+from test.k_multisection_coverage import KMultisectionCoverage
 from test.threshold_coverage import ThresholdCoverage
 
 
@@ -26,7 +27,7 @@ def train(model_name):
     model_manager.train_model()
 
 
-def test(model_name, seed, threshold_tc):
+def test(model_name, seed, threshold_tc, sec_kmnc):
     data_manager, model_manager = __get_manager(model_name)
     threshold_manager = ThresholdManager(model_manager, data_manager.x_train)
 
@@ -41,6 +42,7 @@ def test(model_name, seed, threshold_tc):
             pass
         else:
             coverage_set = [ThresholdCoverage(layer, model_manager, threshold_tc),
+                            KMultisectionCoverage(layer, model_manager, threshold_manager, sec_kmnc),
                             BoundaryCoverage(layer, model_manager, threshold_manager)]
 
             for coverage in coverage_set:

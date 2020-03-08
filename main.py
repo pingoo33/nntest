@@ -34,7 +34,7 @@ def main():
         if mode == 'train':
             train(model_name)
         else:
-            test(model_name, seed, threshold_tc)
+            test(model_name, seed, threshold_tc, sec_kmnc)
 
 
 if __name__ == "__main__":
