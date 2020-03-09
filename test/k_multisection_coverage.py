@@ -33,22 +33,20 @@ class KMultisectionCoverage(Coverage):
                 dict[index] = 0
 
     @staticmethod
-    def calculate_variation(layer, data):
-        size = layer.output_shape[-1]
-
+    def calculate_variation(datas):
         sum_y = 0
-        for d in data:
-            for index in range(size):
-                y = d[index]
+        for data in datas:
+            for d in data:
+                y = d
                 sum_y += y
-        mean = sum_y / (size * 2)
+        mean = sum_y / len(datas[0])
 
         square_sum = 0
-        for d in data:
-            for index in range(size):
-                y = d[index]
+        for data in datas:
+            for d in data:
+                y = d
                 square_sum += (y - mean) ** 2
-        variation = square_sum / (layer.output_shape[-1] * len(data))
+        variation = square_sum / len(datas[0])
 
         return mean, variation
 
@@ -61,7 +59,7 @@ class KMultisectionCoverage(Coverage):
                 if dict[index] in True:
                     covered_number_neurons += 1
 
-        return covered_number_neurons, total_number_neurons, covered_number_neurons / float(total_number_neurons)
+        return covered_number_neurons, covered_number_neurons / float(total_number_neurons)
 
     def update_features(self, data):
         inter_output = self.model_manager.get_intermediate_output(data)
@@ -80,7 +78,7 @@ class KMultisectionCoverage(Coverage):
                 index += 1
 
     def update_graph(self, num_samples):
-        _, _, coverage = self.calculate_coverage()
+        _, coverage = self.calculate_coverage()
         self.plt_x.append(num_samples)
         self.plt_y.append(coverage)
         print("%s layer k-multisection coverage : %.8f" % (self.layer.name, coverage))

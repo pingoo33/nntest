@@ -43,24 +43,22 @@ class BoundaryCoverage(Coverage):
             if self.min_covered_dict[index] is True:
                 covered_number_neurons += 1
 
-        return covered_number_neurons, total_number_neurons, covered_number_neurons / float(total_number_neurons)
+        return covered_number_neurons, covered_number_neurons / float(total_number_neurons)
 
     @staticmethod
-    def calculate_variation(layer, data):
-        size = layer.output_shape[-1]
+    def calculate_variation(data):
+        sum_y = 0
 
-        sum = 0
-        for index in range(size):
-            y = data[index]
-            sum += y
-        mean = sum / size
+        for y in data:
+            sum_y += y
+
+        mean = sum_y / len(data)
 
         square_sum = 0
-        for index in range(size):
-            y = data[index]
+        for y in data:
             square_sum += (y - mean) ** 2
-        variation = square_sum / size
 
+        variation = square_sum / len(data)
         return mean, variation
 
     def update_features(self, data):
@@ -77,7 +75,7 @@ class BoundaryCoverage(Coverage):
                 self.min_frequency_dict[num_neuron] += 1
 
     def update_graph(self, num_samples):
-        _, _, coverage = self.calculate_coverage()
+        _, coverage = self.calculate_coverage()
         self.plt_x.append(num_samples)
         self.plt_y.append(coverage)
         print("%s layer boundary coverage : %.8f" % (self.layer.name, coverage))

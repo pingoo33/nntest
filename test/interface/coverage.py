@@ -21,7 +21,7 @@ class Coverage(__metaclass__=abc.ABCMeta):
 
     @staticmethod
     @abc.abstractmethod
-    def calculate_variation(layer, data):
+    def calculate_variation(data):
         pass
 
     @abc.abstractmethod
