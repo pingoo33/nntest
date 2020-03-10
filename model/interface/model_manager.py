@@ -1,7 +1,14 @@
 import abc
 
+from data.interface.data_manager import DataManager
+
 
 class ModelManager(__metaclass__=abc.ABCMeta):
+    def __init__(self, data_manager: DataManager, model_name):
+        self.model = None
+        self.data_manager = data_manager
+        self.model_name = model_name
+
     @staticmethod
     def __scale(output, rmax=1, rmin=0):
         std = (output - output.min()) / (output.max() - output.min())
@@ -33,4 +40,8 @@ class ModelManager(__metaclass__=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_prob(self, data):
+        pass
+
+    @abc.abstractmethod
+    def cal_hidden_state(self, data, layer_index):
         pass

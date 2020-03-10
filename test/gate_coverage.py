@@ -1,3 +1,5 @@
+from model.interface.model_manager import ModelManager
+from model.state_manager import StateManager
 from test.interface.coverage import Coverage
 import numpy as np
 from matplotlib import pyplot as plt
@@ -5,7 +7,7 @@ from collections import defaultdict
 
 
 class GateCoverage(Coverage):
-    def __init__(self, layer, model_manager, state_manager, threshold, data):
+    def __init__(self, layer, model_manager: ModelManager, state_manager: StateManager, threshold, data):
         self.plt_x = []
         self.plt_y = []
         self.fr_plt_x = []

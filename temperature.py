@@ -1,5 +1,6 @@
 import random
 
+from data.interface.data_manager import DataManager
 from data.normal_mutant_callback import NormalMutantCallback
 from data.temerature import TemperatureData
 from data.temperature_distribution import TemperatureDistribution
@@ -31,7 +32,7 @@ def train(model_name):
     model_manager.train_model()
 
 
-def __mutant_data_process(data_manager, coverage_set, target_data):
+def __mutant_data_process(data_manager: DataManager, coverage_set, target_data):
     for data in target_data:
         for coverage in coverage_set:
             # TODO: implement oracle
@@ -43,7 +44,7 @@ def __mutant_data_process(data_manager, coverage_set, target_data):
                 data_manager.update_sample()
 
                 coverage.update_features(data)
-                coverage.update_graph(data_manager.num_samples)
+                coverage.update_graph(data_manager.get_num_samples())
 
     for coverage in coverage_set:
         coverage.update_frequency_graph()

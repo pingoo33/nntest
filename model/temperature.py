@@ -5,6 +5,7 @@ import keras.backend as K
 from keras import Model
 import numpy as np
 
+from data.interface.data_manager import DataManager
 from model.interface.model_manager import ModelManager
 
 
@@ -13,10 +14,8 @@ def root_mean_squared_error(y_true, y_pred):
 
 
 class Temperature(ModelManager):
-    def __init__(self, data_manager, model_name):
-        self.model = None
-        self.data_manager = data_manager
-        self.model_name = model_name
+    def __init__(self, data_manager: DataManager, model_name):
+        super().__init__(data_manager, model_name)
 
         self.x_train, self.y_train = self.data_manager.get_train_data()
         self.x_test, self.y_test = self.data_manager.get_test_data()

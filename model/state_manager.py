@@ -1,5 +1,8 @@
+from model.interface.model_manager import ModelManager
+
+
 class StateManager:
-    def __init__(self, model_manager, layer_index):
+    def __init__(self, model_manager: ModelManager, layer_index):
         self.model_manager = model_manager
         self.layer_index = layer_index
 

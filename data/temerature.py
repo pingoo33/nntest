@@ -3,10 +3,11 @@ import pandas as pd
 from sklearn.preprocessing import RobustScaler
 import random
 from data.interface.data_manager import DataManager
+from data.interface.mutant_callback import MutantCallback
 
 
 class TemperatureData(DataManager):
-    def __init__(self, mutant_callback):
+    def __init__(self, mutant_callback: MutantCallback):
         self.mutant_callback = mutant_callback
         self.num_samples = None
         self.x_train = None
@@ -71,17 +72,20 @@ class TemperatureData(DataManager):
         new_data = np.array(origin_data)
 
         for i in range(11):
-            new_data[i] = self.mutant_callback(origin_data)
+            new_data[i] = self.mutant_callback.mutant_data(origin_data)
 
         data[random_idx] = np.array(new_data)
         return data, new_data
+
+    def get_num_samples(self):
+        return self.num_samples
 
     # def update_sample(self, output2, output1, m, o):
     def update_sample(self):
         # error = abs(output2 - output1)
 
         # if error >= 0.0001 and o == True:
-        #     self.num_adv += 1
+        #     self.num_adv += 1s
         #     self.perturbations.append(m)
         self.num_samples += 1
         self.display_success_rate()

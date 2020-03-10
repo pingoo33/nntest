@@ -1,4 +1,7 @@
 from collections import defaultdict
+
+from model.interface.model_manager import ModelManager
+from model.state_manager import StateManager
 from test.interface.coverage import Coverage
 import numpy as np
 from matplotlib import pyplot as plt
@@ -9,7 +12,7 @@ import itertools
 
 
 class SequenceCoverage(Coverage):
-    def __init__(self, layer, model_manager, state_manager, symbols, seq):
+    def __init__(self, layer, model_manager: ModelManager, state_manager: StateManager, symbols, seq):
         self.plt_x = []
         self.plt_y_p = []
         self.plt_y_n = []

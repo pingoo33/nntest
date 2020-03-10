@@ -1,11 +1,13 @@
 from collections import defaultdict
+
+from model.interface.model_manager import ModelManager
 from test.interface.coverage import Coverage
 import numpy as np
 from matplotlib import pyplot as plt
 
 
 class ThresholdCoverage(Coverage):
-    def __init__(self, layer, model_manager, threshold=0):
+    def __init__(self, layer, model_manager: ModelManager, threshold=0):
         self.plt_x = []
         self.plt_y = []
         self.fr_plt_x = []

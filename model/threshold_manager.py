@@ -1,9 +1,11 @@
 from collections import defaultdict
 import numpy as np
 
+from model.interface.model_manager import ModelManager
+
 
 class ThresholdManager:
-    def __init__(self, model_manager, data_set):
+    def __init__(self, model_manager: ModelManager, data_set):
         self.model_manager = model_manager
 
         self.max_threshold_dict = defaultdict(float)

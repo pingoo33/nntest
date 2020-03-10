@@ -17,3 +17,11 @@ class DataManager(__metaclass__=abc.ABCMeta):
     @abc.abstractmethod
     def get_test_data(self):
         pass
+
+    @abc.abstractmethod
+    def get_num_samples(self):
+        pass
+
+    @abc.abstractmethod
+    def update_sample(self):
+        pass
