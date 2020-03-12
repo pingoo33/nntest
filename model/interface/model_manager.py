@@ -41,7 +41,3 @@ class ModelManager(__metaclass__=abc.ABCMeta):
     @abc.abstractmethod
     def get_prob(self, data):
         pass
-
-    @abc.abstractmethod
-    def cal_hidden_state(self, data, layer_index):
-        pass
