@@ -35,11 +35,11 @@ class TemperatureData(DataManager):
         data_y = []
 
         train_data = np.array(train_data)
-        self.raw_data = train_data
+        self.raw_data = train_data[:, 3:]
 
         self.scaler = RobustScaler()
-        self.scaler.fit(self.raw_data[:, 3:])
-        normalize = self.scaler.transform(self.raw_data[:, 3:])
+        self.scaler.fit(self.raw_data)
+        normalize = self.scaler.transform(self.raw_data)
 
         DF_data = normalize
         Adata_1 = np.array(DF_data)
@@ -74,7 +74,8 @@ class TemperatureData(DataManager):
         for i in range(11):
             new_data[i] = self.mutant_callback.mutant_data(origin_data)
 
-        data[random_idx] = np.array(new_data)
+        normalized_new_data = self.normalize(new_data)
+        data[random_idx] = np.array(normalized_new_data)
         return data, new_data
 
     def get_num_samples(self):
