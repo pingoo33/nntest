@@ -11,28 +11,24 @@ class TemperatureDistribution(DataDistribution):
         self.load_distribution()
 
     def load_distribution(self):
-        csv_file_list = []
+        train_data = pd.read_csv("./dataset/train_data.csv", sep=',')
+        train_data = np.array(train_data)
+        raw = train_data[:, 3:]
 
-        for file in os.listdir("./dataset/temperature"):
-            if file.endswith(".csv"):
-                data = pd.read_csv("./dataset/temperature/" + str(file), sep=',')
-                csv_file_list.append(np.array(data, dtype=float))
+        sort_data = [[]] * 4
 
-        file_list = []
-        for i in range(len(csv_file_list)):
-            DF_data = csv_file_list[i]
-            Adata_1 = np.array(DF_data)
-            file_list.append(Adata_1[:, 3:-1])
+        for data in raw:
+            sort_data[self.get_index(data)].append(data)
 
         model_data_by_column = []
-        for data_list in file_list:
-            file_by_column = []
-            for mut_column in range(11):
-                data_by_column = []
-                for d in data_list:
-                    data_by_column.append(d[mut_column])
-                file_by_column.append(data_by_column)
-            model_data_by_column.append(file_by_column)
+        for data_list in sort_data:
+            temp = []
+            for column in range(12):
+                temp_column = []
+                for data in data_list:
+                    temp_column.append(data[column])
+                temp.append(temp_column)
+            model_data_by_column.append(temp)
 
         model_data_by_column = np.array(model_data_by_column)
 
@@ -41,7 +37,7 @@ class TemperatureDistribution(DataDistribution):
         for file in range(4):
             means = []
             stds = []
-            for mut_column in range(11):
+            for mut_column in range(12):
                 means.append(np.mean(model_data_by_column[file][mut_column]))
                 stds.append(np.std(model_data_by_column[file][mut_column]))
             means_by_file.append(means)
@@ -52,13 +48,13 @@ class TemperatureDistribution(DataDistribution):
 
     @staticmethod
     def get_index(data):
-        month = data[0]
+        temperature = data[0]
 
-        if month == 12 or 1 <= month <= 2:
+        if 15 < temperature < 25:
             target_f_idx = 0
-        elif 3 <= month <= 5:
+        elif temperature >= 25:
             target_f_idx = 1
-        elif 6 <= month <= 8:
+        elif -5 < temperature < 15:
             target_f_idx = 2
         else:
             target_f_idx = 3

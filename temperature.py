@@ -71,7 +71,7 @@ def test(model_name, seed, threshold_tc, sec_kmnc, threshold_cc, threshold_gc, s
 
             __mutant_data_process(data_manager, coverage_set, target_data)
         else:
-            threshold_manager = ThresholdManager(model_manager, data_manager.x_train)
+            threshold_manager = ThresholdManager(model_manager, layer, data_manager.x_train)
             coverage_set = [ThresholdCoverage(layer, model_manager, threshold_tc),
                             KMultisectionCoverage(layer, model_manager, threshold_manager, sec_kmnc),
                             BoundaryCoverage(layer, model_manager, threshold_manager)]

@@ -21,7 +21,7 @@ class StateManager:
         # we process the placeholders later (Inputs node in Keras). Because there's a bug in Tensorflow.
         input_layer_outputs, layer_outputs = [], []
         [input_layer_outputs.append(node) if 'input_' in node.name else layer_outputs.append(node) for node in nodes]
-        activations = self.__evaluate(self.model_manager.model, layer_outputs, x)
+        activations = self.__evaluate(layer_outputs, x)
         activations_dict = dict(zip([output.name for output in layer_outputs], activations))
         activations_inputs_dict = dict(zip([output.name for output in input_layer_outputs], x))
         result = activations_inputs_dict.copy()
@@ -98,5 +98,5 @@ class StateManager:
         return hidden
 
     def get_forget_state(self, data):
-        _, gate, _ = self.cal_hidden_state(data, self.layer_index)
+        _, _, gate = self.cal_hidden_state(data, self.layer_index)
         return gate

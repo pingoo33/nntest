@@ -5,10 +5,14 @@ from model.threshold_manager import ThresholdManager
 from test.interface.coverage import Coverage
 import numpy as np
 from matplotlib import pyplot as plt
+import sys
 
 
 class KMultisectionCoverage(Coverage):
     def __init__(self, layer, model_manager: ModelManager, threshold_manager: ThresholdManager, size):
+        if layer.name == threshold_manager.layer.name:
+            sys.exit("Unmatch layer: KMultisectionCoverage")
+
         self.num_section = size
         self.neuron_frequency = defaultdict(int)
         self.plt_x = []
@@ -67,8 +71,8 @@ class KMultisectionCoverage(Coverage):
     def update_features(self, data):
         inter_output = self.model_manager.get_intermediate_output(self.layer, data)
         for num_neuron in range(inter_output.shape[-1]):
-            max_threshold = self.threshold_manager.get_max_threshold(self.layer.name, num_neuron)
-            min_threshold = self.threshold_manager.get_min_threshold(self.layer.name, num_neuron)
+            max_threshold = self.threshold_manager.get_max_threshold(num_neuron)
+            min_threshold = self.threshold_manager.get_min_threshold(num_neuron)
             delta = (max_threshold - min_threshold) / self.num_section
 
             index = 0

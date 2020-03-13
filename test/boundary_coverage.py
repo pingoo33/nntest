@@ -9,6 +9,9 @@ from matplotlib import pyplot as plt
 
 class BoundaryCoverage(Coverage):
     def __init__(self, layer, model_manager: ModelManager, threshold_manager: ThresholdManager):
+        if layer.name == threshold_manager.layer.name:
+            sys.exit("Unmatch layer: BoundaryCoverage")
+
         self.plt_x = []
         self.plt_y = []
         self.fr_plt_x = []
@@ -67,8 +70,8 @@ class BoundaryCoverage(Coverage):
     def update_features(self, data):
         inter_output = self.model_manager.get_intermediate_output(self.layer, data)
         for num_neuron in range(inter_output.shape[-1]):
-            max_threshold = self.threshold_manager.get_max_threshold(self.layer.name, num_neuron)
-            min_threshold = self.threshold_manager.get_min_threshold(self.layer.name, num_neuron)
+            max_threshold = self.threshold_manager.get_max_threshold(num_neuron)
+            min_threshold = self.threshold_manager.get_min_threshold(num_neuron)
 
             if np.mean(inter_output[..., num_neuron]) > max_threshold:
                 self.max_covered_dict[num_neuron] = True

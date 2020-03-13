@@ -1,7 +1,7 @@
 import abc
 
 
-class MutantCallback(__metaclass__=abc.ABCMeta):
+class MutantCallback(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def mutant_data(self, data):
         pass

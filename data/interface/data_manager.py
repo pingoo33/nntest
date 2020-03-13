@@ -1,7 +1,7 @@
 import abc
 
 
-class DataManager(__metaclass__=abc.ABCMeta):
+class DataManager(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def load_data(self):
         pass

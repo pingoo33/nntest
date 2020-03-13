@@ -23,7 +23,7 @@ def main():
     seed = int(args.seed_num)
     threshold_tc = int(args.threshold_tc)
     sec_kmnc = int(args.sec_kmnc)
-    threshold_cc = int(args.threshold_cc)
+    threshold_cc = float(args.threshold_cc)
     threshold_gc = float(args.threshold_gc)
     symbols_sq = int(args.symbols_sq)
     seq = args.seq

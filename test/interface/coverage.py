@@ -2,7 +2,7 @@ import abc
 from keras import backend as K
 
 
-class Coverage(__metaclass__=abc.ABCMeta):
+class Coverage(metaclass=abc.ABCMeta):
     @staticmethod
     def __normalize(x):
         return x / (K.sqrt(K.mean(K.square(x))) + 1e-5)

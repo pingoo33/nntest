@@ -10,4 +10,8 @@ class NormalMutantCallback(MutantCallback):
     def mutant_data(self, data):
         mean, std = self.distribution.get_distribution(data)
 
-        return np.random.normal(loc=mean, scale=std)
+        new_data = []
+        for i in range(12):
+            new_data.append(np.random.normal(loc=mean[i], scale=std[i]))
+
+        return np.array(new_data)

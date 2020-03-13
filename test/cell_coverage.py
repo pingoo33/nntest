@@ -20,7 +20,7 @@ class CellCoverage(Coverage):
         self.threshold = threshold
         self.hidden = self.state_manager.get_hidden_state(data)
         activation = self.__get_activation()
-        self.total_feature = (np.argwhere(activation >= np.min(activation))).tolist()
+        self.total_feature = len((np.argwhere(activation >= np.min(activation))).tolist())
 
         self.covered_dict = defaultdict(bool)
         self.frequency_dict = defaultdict(int)

@@ -23,7 +23,7 @@ class Temperature(ModelManager):
     def get_intermediate_output(self, layer, data):
         intermediate_layer_model = Model(inputs=self.model.input,
                                          outputs=self.model.get_layer(layer.name).output)
-        return self.__scale(intermediate_layer_model.predict(np.expand_dims(data, axis=0)))
+        return intermediate_layer_model.predict(np.expand_dims(data, axis=0))
 
     def load_model(self):
         self.model = load_model('models/' + self.model_name + '.h5',

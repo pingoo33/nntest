@@ -40,7 +40,7 @@ class ThresholdCoverage(Coverage):
         return covered_number_neurons, covered_number_neurons / float(total_number_neurons)
 
     def update_features(self, data):
-        inter_output = self.model_manager.get_intermediate_output(data)
+        inter_output = self.model_manager.get_intermediate_output(self.layer, data)
         for num_neuron in range(inter_output.shape[-1]):
             if np.mean(inter_output[..., num_neuron]) > self.threshold:
                 self.covered_dict[num_neuron] = True

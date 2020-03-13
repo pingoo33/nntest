@@ -3,16 +3,11 @@ import abc
 from data.interface.data_manager import DataManager
 
 
-class ModelManager(__metaclass__=abc.ABCMeta):
+class ModelManager(metaclass=abc.ABCMeta):
     def __init__(self, data_manager: DataManager, model_name):
         self.model = None
         self.data_manager = data_manager
         self.model_name = model_name
-
-    @staticmethod
-    def __scale(output, rmax=1, rmin=0):
-        std = (output - output.min()) / (output.max() - output.min())
-        return std * (rmax - rmin) + rmin
 
     @abc.abstractmethod
     def get_layer_name(self, index):

@@ -1,7 +1,7 @@
 import abc
 
 
-class DataDistribution(__metaclass__=abc.ABCMeta):
+class DataDistribution(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def load_distribution(self):
         pass

@@ -14,10 +14,11 @@ class TemperatureData(DataManager):
         self.y_train = None
         self.x_test = None
         self.y_test = None
-        self.raw_data = []
+        self.raw = []
         self.num_adv = 0
         self.num_samples = 0
         self.perturbations = []
+        self.scaler = None
         self.load_data()
 
     def get_train_data(self):
@@ -35,11 +36,11 @@ class TemperatureData(DataManager):
         data_y = []
 
         train_data = np.array(train_data)
-        self.raw_data = train_data[:, 3:]
+        self.raw = train_data[:, 3:]
 
         self.scaler = RobustScaler()
-        self.scaler.fit(self.raw_data)
-        normalize = self.scaler.transform(self.raw_data)
+        self.scaler.fit(self.raw)
+        normalize = self.scaler.transform(self.raw)
 
         DF_data = normalize
         Adata_1 = np.array(DF_data)
@@ -59,7 +60,7 @@ class TemperatureData(DataManager):
 
     def normalize(self, data):
         new_axis_data = data[np.newaxis, :]
-        new_raw_data = np.append(self.raw_data, new_axis_data, axis=0)
+        new_raw_data = np.append(self.raw, new_axis_data, axis=0)
         scaler = RobustScaler()
         scaler.fit(new_raw_data)
         new_normalize = scaler.transform(new_raw_data)
@@ -69,10 +70,8 @@ class TemperatureData(DataManager):
         random_idx = random.randrange(0, 12)
         selected_data = data[random_idx]
         origin_data = self.scaler.inverse_transform(selected_data[np.newaxis, :])[0]
-        new_data = np.array(origin_data)
 
-        for i in range(11):
-            new_data[i] = self.mutant_callback.mutant_data(origin_data)
+        new_data = self.mutant_callback.mutant_data(origin_data)
 
         normalized_new_data = self.normalize(new_data)
         data[random_idx] = np.array(normalized_new_data)
