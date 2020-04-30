@@ -2,19 +2,18 @@ from collections import defaultdict
 
 from model.interface.model_manager import ModelManager
 from model.threshold_manager import ThresholdManager
-from test.interface.coverage import Coverage
+from test.interface.FCL_coverage import FCLCoverage
 import numpy as np
 from matplotlib import pyplot as plt
 import sys
 
 
-class KMultisectionCoverage(Coverage):
+class KMultisectionCoverage(FCLCoverage):
     def __init__(self, layer, model_manager: ModelManager, threshold_manager: ThresholdManager, size):
         if layer.name == threshold_manager.layer.name:
             sys.exit("Unmatch layer: KMultisectionCoverage")
 
         self.num_section = size
-        self.neuron_frequency = defaultdict(int)
         self.plt_x = []
         self.plt_y = []
         self.fr_plt_x = []
@@ -114,7 +113,7 @@ class KMultisectionCoverage(Coverage):
                     bottom=self.frequency_dicts[i - 1])
 
         plt.xlabel('features')
-        plt.ylabel('activate counts')
+        plt.ylabel('number of activation')
         plt.title(self.layer.name + ' Frequency')
         plt.xlim(-1, n_groups)
         plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_bc_Frequency.png')

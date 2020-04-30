@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from model.interface.model_manager import ModelManager
 from model.state_manager import StateManager
-from test.interface.coverage import Coverage
+from test.interface.RL_coverage import RLCoverage
 import numpy as np
 from matplotlib import pyplot as plt
 from saxpy.alphabet import cuts_for_asize
@@ -11,7 +11,7 @@ from saxpy.znorm import znorm
 import itertools
 
 
-class SequenceCoverage(Coverage):
+class SequenceCoverage(RLCoverage):
     def __init__(self, layer, model_manager: ModelManager, state_manager: StateManager, symbols, seq):
         self.plt_x = []
         self.plt_y_p = []
@@ -32,6 +32,8 @@ class SequenceCoverage(Coverage):
         self.covered_dict_n = defaultdict(bool)
         self.frequency_dict_p = defaultdict(int)
         self.frequency_dict_n = defaultdict(int)
+        self.__init_covered_dict()
+        self.__init_frequency_dict()
 
     def __init_feature(self):
         t1 = int(self.seq[0])
@@ -153,7 +155,7 @@ class SequenceCoverage(Coverage):
         plt.bar(index, self.fr_plt_y_n, align='center')
 
         plt.xlabel('features')
-        plt.ylabel('activation counts')
+        plt.ylabel('number of activation')
         plt.title(self.layer.name + ' Frequency')
         plt.xlim(-1, n_groups)
         plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_snc_Frequency.png')

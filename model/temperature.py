@@ -69,6 +69,37 @@ class Temperature(ModelManager):
     def get_layer(self, index):
         return self.model.layers[index]
 
+    def get_all_layer(self):
+        return self.model.layers
+
+    @staticmethod
+    def __get_layer_type(layer_name):
+        return layer_name.split('_')[0]
+
+    def get_lstm_layer(self):
+        indices = []
+        layers = []
+        for index, layer in enumerate(self.model.layers):
+            if 'input' in layer.name or 'concatenate' in layer.name:
+                continue
+            layer_type = self.__get_layer_type(layer.name)
+            if layer_type == "lstm":
+                layers.append(layer)
+                indices.append(index)
+        return indices, layers
+
+    def get_fc_layer(self):
+        indices = []
+        layers = []
+        for index, layer in enumerate(self.model.layers):
+            if 'input' in layer.name or 'concatenate' in layer.name:
+                continue
+            layer_type = self.__get_layer_type(layer.name)
+            if layer_type != "lstm":
+                layers.append(layer)
+                indices.append(index)
+        return indices, layers
+
     def get_prob(self, data):
         data = data[np.newaxis, :]
         prob = np.squeeze(self.model.predict(data))
