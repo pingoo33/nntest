@@ -2,12 +2,12 @@ from collections import defaultdict
 
 from model.interface.model_manager import ModelManager
 from model.state_manager import StateManager
-from test.interface.coverage import Coverage
+from test.interface.RL_coverage import RLCoverage
 import numpy as np
 from matplotlib import pyplot as plt
 
 
-class CellCoverage(Coverage):
+class CellCoverage(RLCoverage):
     def __init__(self, layer, model_manager: ModelManager, state_manager: StateManager, threshold, data):
         self.plt_x = []
         self.plt_y = []
@@ -24,6 +24,8 @@ class CellCoverage(Coverage):
 
         self.covered_dict = defaultdict(bool)
         self.frequency_dict = defaultdict(int)
+        self.__init_covered_dict()
+        self.__init_frequency_dict()
 
     def __init_covered_dict(self):
         for index in range(self.total_feature):
@@ -100,7 +102,7 @@ class CellCoverage(Coverage):
         plt.bar(index, self.fr_plt_y, align='center')
 
         plt.xlabel('features')
-        plt.ylabel('activation counts')
+        plt.ylabel('number of activation')
         plt.title(self.layer.name + ' Frequency')
         plt.xlim(-1, n_groups)
         plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_cc_Frequency.png')

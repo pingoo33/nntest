@@ -2,12 +2,12 @@ from collections import defaultdict
 
 from model.interface.model_manager import ModelManager
 from model.threshold_manager import ThresholdManager
-from test.interface.coverage import Coverage
+from test.interface.FCL_coverage import FCLCoverage
 import numpy as np
 from matplotlib import pyplot as plt
 
 
-class BoundaryCoverage(Coverage):
+class BoundaryCoverage(FCLCoverage):
     def __init__(self, layer, model_manager: ModelManager, threshold_manager: ThresholdManager):
         if layer.name == threshold_manager.layer.name:
             sys.exit("Unmatch layer: BoundaryCoverage")
@@ -108,7 +108,7 @@ class BoundaryCoverage(Coverage):
         plt.bar(index, self.min_frequency_dict, align='center', color='#5233aa', bottom=self.max_frequency_dict)
 
         plt.xlabel('features')
-        plt.ylabel('activate counts')
+        plt.ylabel('number of activation')
         plt.title(self.layer.name + ' Frequency')
         plt.xlim(-1, n_groups)
         plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_bc_Frequency.png')

@@ -1,21 +1,20 @@
-from collections import defaultdict
-
 from model.interface.model_manager import ModelManager
 from test.interface.FCL_coverage import FCLCoverage
+from collections import defaultdict
 import numpy as np
 from matplotlib import pyplot as plt
 
 
-class ThresholdCoverage(FCLCoverage):
-    def __init__(self, layer, model_manager: ModelManager, threshold=0):
+class TopKCoverage(FCLCoverage):
+    def __init__(self, layer, model_manager: ModelManager, size):
+        self.layer = layer
+        self.size = size
+        self.model_manager = model_manager
+
         self.plt_x = []
         self.plt_y = []
         self.fr_plt_x = []
         self.fr_plt_y = []
-
-        self.layer = layer
-        self.model_manager = model_manager
-        self.threshold = threshold
 
         self.covered_dict = defaultdict(bool)
         self.__init_covered_dict()
@@ -23,7 +22,7 @@ class ThresholdCoverage(FCLCoverage):
         self.__init_frequency_dict()
 
     def __init_covered_dict(self):
-        for index in range(self.layer.output_shape[-1]):
+        for index in range(self.size):
             self.covered_dict[index] = False
 
     def __init_frequency_dict(self):
@@ -41,21 +40,22 @@ class ThresholdCoverage(FCLCoverage):
 
     def update_features(self, data):
         inter_output = self.model_manager.get_intermediate_output(self.layer, data)
+        neuron_outputs = []
         for num_neuron in range(inter_output.shape[-1]):
-            if np.mean(inter_output[..., num_neuron]) > self.threshold:
-                self.covered_dict[num_neuron] = True
-                self.frequency_dict[num_neuron] += 1
+            neuron_outputs.append(np.mean(inter_output[..., num_neuron]))
+
+        neuron_outputs = neuron_outputs.sort(reverse=True)
+        for index in range(self.size):
+            for num_neuron in range(inter_output.shape[-1]):
+                if np.mean(inter_output[..., num_neuron]) == neuron_outputs[index]:
+                    self.covered_dict[num_neuron] = True
+                    self.frequency_dict[num_neuron] += 1
 
     def update_graph(self, num_samples):
         _, coverage = self.calculate_coverage()
         self.plt_x.append(num_samples)
         self.plt_y.append(coverage)
-        print("%s layer threshold coverage : %.8f" % (self.layer.name, coverage))
-
-    def update_frequency_graph(self):
-        for num_neuron in range(self.layer.output_shape[-1]):
-            self.fr_plt_x.append(num_neuron)
-            self.fr_plt_y.append(self.frequency_dict[num_neuron])
+        print("%s layer Top-k coverage : %.8f" % (self.layer.name, coverage))
 
     @staticmethod
     def calculate_variation(data):
@@ -73,12 +73,17 @@ class ThresholdCoverage(FCLCoverage):
         variation = square_sum / len(data)
         return mean, variation
 
+    def update_frequency_graph(self):
+        for num_neuron in range(self.layer.output_shape[-1]):
+            self.fr_plt_x.append(num_neuron)
+            self.fr_plt_y.append(self.frequency_dict[num_neuron])
+
     def display_graph(self):
         plt.plot(self.plt_x, self.plt_y)
         plt.xlabel('# of generated samples')
         plt.ylabel('coverage')
-        plt.title('Threshold Coverage of ' + self.layer.name)
-        plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_tc.png')
+        plt.title('Top-k Coverage of ' + self.layer.name)
+        plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_tkc.png')
         plt.clf()
 
     def display_frequency_graph(self):
@@ -91,5 +96,5 @@ class ThresholdCoverage(FCLCoverage):
         plt.ylabel('number of activation')
         plt.title(self.layer.name + ' Frequency')
         plt.xlim(-1, n_groups)
-        plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_tc_Frequency.png')
+        plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_tkc_Frequency.png')
         plt.clf()

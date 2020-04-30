@@ -18,6 +18,10 @@ class ModelManager(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
+    def get_all_layer(self):
+        pass
+
+    @abc.abstractmethod
     def train_model(self):
         pass
 
@@ -35,4 +39,12 @@ class ModelManager(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_prob(self, data):
+        pass
+
+    @abc.abstractmethod
+    def get_lstm_layer(self):
+        pass
+
+    @abc.abstractmethod
+    def get_fc_layer(self):
         pass

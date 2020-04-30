@@ -15,6 +15,8 @@ def main():
     parser.add_argument('--threshold_gc', dest='threshold_gc', default='0.705', help='')
     parser.add_argument('--symbols_sq', dest='symbols_sq', default='2', help='')
     parser.add_argument('--seq', dest='seq', default='[7,11]', help='')
+    parser.add_argument('--size_tkc', dest='size_tkc', default='1', help='')
+    parser.add_argument('--size_tkpc', dest='size_tkpc', default='1', help='')
     parser.add_argument('--mode', dest='mode', default='test', help='')
 
     args = parser.parse_args()
@@ -28,13 +30,16 @@ def main():
     symbols_sq = int(args.symbols_sq)
     seq = args.seq
     seq = re.findall(r"\d+\.?\d*", seq)
+    size_tkc = args.size_tkc
+    size_tkpc = args.size_tkpc
     mode = args.mode
 
     if model_name == 'temperature':
         if mode == 'train':
             train(model_name)
         else:
-            test(model_name, seed, threshold_tc, sec_kmnc, threshold_cc, threshold_gc, symbols_sq, seq)
+            test(model_name, seed, threshold_tc, sec_kmnc, threshold_cc, threshold_gc, symbols_sq, seq, size_tkc,
+                 size_tkpc)
 
 
 if __name__ == "__main__":

@@ -1,7 +1,13 @@
 import abc
+from keras import backend as K
+from .coverage import Coverage
 
 
-class Coverage(metaclass=abc.ABCMeta):
+class FCLCoverage(metaclass=abc.ABCMeta, Coverage):
+    @staticmethod
+    def __normalize(x):
+        return x / (K.sqrt(K.mean(K.square(x))) + 1e-5)
+
     @abc.abstractmethod
     def calculate_coverage(self):
         pass
