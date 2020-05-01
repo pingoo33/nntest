@@ -22,7 +22,7 @@ class ModelManager(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def train_model(self):
+    def train_model(self, fold_size):
         pass
 
     @abc.abstractmethod

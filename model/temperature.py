@@ -4,6 +4,7 @@ from keras.optimizers import Adadelta
 import keras.backend as K
 from keras import Model
 import numpy as np
+from sklearn.model_selection import KFold
 
 from data.interface.data_manager import DataManager
 from model.interface.model_manager import ModelManager
@@ -34,30 +35,44 @@ class Temperature(ModelManager):
         score = self.model.evaluate(self.x_test, self.y_test, verbose=0)
         print(self.model_name + "'s score : %.8f" % score[1])
 
-    def train_model(self):
+    def train_model(self, fold_size):
         n_hidden = 64
         n_seq = 12
         n_input = 12
         n_output = 1
-        iterations = 200
+        epochs = 200
         batch_size = 32
 
-        input_layer = Input(shape=(n_seq, n_input))
+        model_list = []
+        accuracy_list = []
 
-        lstm1 = LSTM(n_hidden, return_sequences=True)(input_layer)
-        rnn_outputs = LSTM(n_hidden, activation='tanh')(lstm1)
+        kfold = KFold(n_splits=fold_size, shuffle=True)
+        for train_index, test_index in kfold.split(self.x_train, self.y_train):
+            input_layer = Input(shape=(n_seq, n_input))
 
-        rnn_outputs = Dense(n_output * 4)(rnn_outputs)
-        outputs = Dense(n_output, activation='linear')(rnn_outputs)
+            lstm1 = LSTM(n_hidden, return_sequences=True)(input_layer)
+            rnn_outputs = LSTM(n_hidden, activation='tanh')(lstm1)
 
-        self.model = Model(inputs=input_layer, outputs=outputs)
+            rnn_outputs = Dense(n_output * 4)(rnn_outputs)
+            outputs = Dense(n_output, activation='linear')(rnn_outputs)
 
-        opt = Adadelta(lr=0.001)
-        self.model.compile(optimizer=opt, loss='mean_squared_error', metrics=[root_mean_squared_error])
+            model = Model(inputs=input_layer, outputs=outputs)
 
-        self.model.fit(x=self.x_train, y=self.y_train, validation_data=(self.x_test, self.y_test),
-                       batch_size=batch_size, epochs=iterations, shuffle=True)
-        self.model.save('models/' + self.model_name + '.h5')
+            opt = Adadelta(lr=0.001)
+            model.compile(optimizer=opt, loss='mean_squared_error', metrics=[root_mean_squared_error])
+
+            model.fit(x=self.x_train[train_index], y=self.y_train[train_index],
+                      validation_data=(self.x_test[test_index], self.y_test[test_index]),
+                      batch_size=batch_size, epochs=epochs, shuffle=True)
+            model_list.append(self.model)
+            accuracy_list.append(self.model.evaluate(self.x_train(test_index), self.x_test(test_index))[1])
+
+        acc = 0.0
+        for i in range(len(model_list)):
+            if accuracy_list[i] > acc:
+                self.model = model_list[i]
+
+        self.model.save('models/kfold_' + self.model_name + '.h5')
 
     def test_model(self):
         pass
