@@ -71,7 +71,9 @@ class Temperature(ModelManager):
         for i in range(len(model_list)):
             if accuracy_list[i] > acc:
                 self.model = model_list[i]
+                acc = accuracy_list[i]
 
+        print("accuracy : ", str(acc))
         self.model.save('models/kfold_' + self.model_name + '.h5')
 
     def test_model(self):

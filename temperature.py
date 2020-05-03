@@ -25,9 +25,9 @@ def __get_manager(model_name):
     return data_manager, Temperature(data_manager, model_name)
 
 
-def train(model_name):
+def train(model_name, fold_size):
     _, model_manager = __get_manager(model_name)
-    model_manager.train_model()
+    model_manager.train_model(fold_size)
 
 
 def __mutant_data_process(data_manager: DataManager, coverage_set, target_data):
