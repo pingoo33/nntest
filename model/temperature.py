@@ -64,8 +64,8 @@ class Temperature(ModelManager):
             model.fit(x=self.x_train[train_index], y=self.y_train[train_index],
                       validation_data=(self.x_train[test_index], self.y_train[test_index]),
                       batch_size=batch_size, epochs=epochs, shuffle=True)
-            model_list.append(self.model)
-            accuracy_list.append(self.model.evaluate(self.x_test, self.y_test)[1])
+            model_list.append(model)
+            accuracy_list.append(model.evaluate(self.x_test, self.y_test)[1])
 
         acc = 0.0
         for i in range(len(model_list)):
