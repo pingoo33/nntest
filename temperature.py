@@ -59,14 +59,14 @@ def test(model_name, seed, threshold_tc, sec_kmnc, threshold_cc, threshold_gc, s
     indices, lstm_layers = model_manager.get_lstm_layer()
     _, other_layers = model_manager.get_fc_layer()
 
-    init_data = target_data[15]
-    layer = lstm_layers[0]
-    state_manager = StateManager(model_manager, indices[0])
-    coverage_set = [CellCoverage(layer, model_manager, state_manager, threshold_cc, init_data),
-                    GateCoverage(layer, model_manager, state_manager, threshold_gc, init_data),
-                    SequenceCoverage(layer, model_manager, state_manager, symbols_sq, seq)]
-
-    __mutant_data_process(data_manager, coverage_set, target_data)
+    # init_data = target_data[15]
+    # layer = lstm_layers[0]
+    # state_manager = StateManager(model_manager, indices[0])
+    # coverage_set = [CellCoverage(layer, model_manager, state_manager, threshold_cc, init_data),
+    #                 GateCoverage(layer, model_manager, state_manager, threshold_gc, init_data),
+    #                 SequenceCoverage(layer, model_manager, state_manager, symbols_sq, seq)]
+    #
+    # __mutant_data_process(data_manager, coverage_set, target_data)
 
     for layer in other_layers:
         threshold_manager = ThresholdManager(model_manager, layer, data_manager.x_train)

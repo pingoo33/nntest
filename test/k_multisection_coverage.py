@@ -5,13 +5,10 @@ from model.threshold_manager import ThresholdManager
 from test.interface.FCL_coverage import FCLCoverage
 import numpy as np
 from matplotlib import pyplot as plt
-import sys
 
 
 class KMultisectionCoverage(FCLCoverage):
     def __init__(self, layer, model_manager: ModelManager, threshold_manager: ThresholdManager, size):
-        if layer.name == threshold_manager.layer.name:
-            sys.exit("Unmatch layer: KMultisectionCoverage")
 
         self.num_section = size
         self.plt_x = []
@@ -62,7 +59,7 @@ class KMultisectionCoverage(FCLCoverage):
         covered_number_neurons = 0
         for dict in self.covered_dicts:
             for index in range(size):
-                if dict[index] in True:
+                if dict[index] is True:
                     covered_number_neurons += 1
 
         return covered_number_neurons, covered_number_neurons / float(total_number_neurons)
@@ -105,12 +102,12 @@ class KMultisectionCoverage(FCLCoverage):
 
     def display_frequency_graph(self):
         n_groups = len(self.fr_plt_x)
-        index = np.arrange(n_groups)
+        index = np.arange(n_groups)
 
-        plt.bar(index, self.frequency_dicts[0], align='center')
+        plt.bar(index, self.fr_plt_y[0], align='center')
         for i in range(1, self.num_section):
-            plt.bar(index, self.frequency_dicts[i], align='center', color=(i, i, i, i),
-                    bottom=self.frequency_dicts[i - 1])
+            plt.bar(index, self.fr_plt_y[i], align='center', color=(i, i, i, i),
+                    bottom=self.fr_plt_y[i - 1])
 
         plt.xlabel('features')
         plt.ylabel('number of activation')

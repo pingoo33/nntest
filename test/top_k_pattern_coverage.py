@@ -7,9 +7,12 @@ from matplotlib import pyplot as plt
 
 class TopKPatternCoverage(FCLCoverage):
     def __init__(self, model_manager: ModelManager, size):
-        self.size = size
         self.model_manager = model_manager
         _, self.layers = model_manager.get_fc_layer()
+        if self.layers[-1].output_shape[-1] < size:
+            self.size = self.layers[-1].output_shape[-1]
+        else:
+            self.size = size
 
         self.plt_x = []
         self.plt_y = []
@@ -46,12 +49,12 @@ class TopKPatternCoverage(FCLCoverage):
             self.covered_pattern.append(pattern)
 
     def __get_top_k_neuron_id(self, neuron_outputs):
-        sorted_neuron_outputs = neuron_outputs.sort(reverse=True)
+        neuron_outputs.sort(reverse=True)
 
         top_k_indices = []
         for index_sorted in range(self.size):
             for index, output in enumerate(neuron_outputs):
-                if sorted_neuron_outputs[index_sorted] == output:
+                if neuron_outputs[index_sorted] == output:
                     top_k_indices.append(index)
 
         return top_k_indices.sort()

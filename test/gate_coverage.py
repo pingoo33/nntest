@@ -18,7 +18,7 @@ class GateCoverage(RLCoverage):
         self.state_manager = state_manager
         self.threshold = threshold
         self.gate = self.state_manager.get_forget_state(data)
-        activation = self.__get_activation()
+        activation = self.get_activation()
         self.total_feature = len((np.argwhere(activation >= np.min(activation))).tolist())
 
         self.covered_dict = defaultdict(bool)
@@ -34,7 +34,7 @@ class GateCoverage(RLCoverage):
         for index in range(self.total_feature):
             self.frequency_dict[index] = 0
 
-    def __get_activation(self):
+    def get_activation(self):
         gate = self.gate
         alpha = np.sum(gate, axis=1) / float(gate.shape[1])
         # alpha = np.sum(np.where(gate > 0.8, 1, 0), axis=1)/float(gate.shape[1])
@@ -50,7 +50,7 @@ class GateCoverage(RLCoverage):
 
     def update_features(self, data):
         self.gate = self.state_manager.get_forget_state(data)
-        activation = self.__get_activation()
+        activation = self.get_activation()
         features = (np.argwhere(activation > self.threshold)).tolist()
         for feature in features:
             self.covered_dict[feature[0]] = True

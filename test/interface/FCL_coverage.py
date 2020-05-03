@@ -3,7 +3,7 @@ from keras import backend as K
 from .coverage import Coverage
 
 
-class FCLCoverage(metaclass=abc.ABCMeta, Coverage):
+class FCLCoverage(metaclass=abc.ABCMeta):
     @staticmethod
     def __normalize(x):
         return x / (K.sqrt(K.mean(K.square(x))) + 1e-5)

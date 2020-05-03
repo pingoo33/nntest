@@ -9,8 +9,6 @@ from matplotlib import pyplot as plt
 
 class BoundaryCoverage(FCLCoverage):
     def __init__(self, layer, model_manager: ModelManager, threshold_manager: ThresholdManager):
-        if layer.name == threshold_manager.layer.name:
-            sys.exit("Unmatch layer: BoundaryCoverage")
 
         self.plt_x = []
         self.plt_y = []
@@ -102,10 +100,10 @@ class BoundaryCoverage(FCLCoverage):
 
     def display_frequency_graph(self):
         n_groups = len(self.fr_plt_x)
-        index = np.arrange(n_groups)
+        index = np.arange(n_groups)
 
-        plt.bar(index, self.max_frequency_dict, align='center')
-        plt.bar(index, self.min_frequency_dict, align='center', color='#5233aa', bottom=self.max_frequency_dict)
+        plt.bar(index, self.max_fr_plt_y, align='center')
+        plt.bar(index, self.min_fr_plt_y, align='center', color='#5233aa', bottom=self.max_fr_plt_y)
 
         plt.xlabel('features')
         plt.ylabel('number of activation')

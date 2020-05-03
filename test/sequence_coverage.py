@@ -55,7 +55,7 @@ class SequenceCoverage(RLCoverage):
             self.frequency_dict_p[index] = 0
             self.frequency_dict_n[index] = 0
 
-    def __get_activation(self):
+    def get_activation(self):
         hidden = self.hidden
         alpha1 = np.sum(np.where(hidden > 0, hidden, 0), axis=1)
         alpha2 = np.sum(np.where(hidden < 0, hidden, 0), axis=1)
@@ -76,7 +76,7 @@ class SequenceCoverage(RLCoverage):
 
     def update_features(self, data):
         self.hidden = self.state_manager.get_hidden_state(data)
-        activation_p, activation_n = self.__get_activation()
+        activation_p, activation_n = self.get_activation()
         dat_znorm_p = znorm(activation_p[self.indices])
         dat_znorm_n = znorm(activation_n[self.indices])
         sym_rep_p = ts_to_string(dat_znorm_p, cuts_for_asize(self.symbols))

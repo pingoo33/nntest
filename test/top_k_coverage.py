@@ -7,8 +7,12 @@ from matplotlib import pyplot as plt
 
 class TopKCoverage(FCLCoverage):
     def __init__(self, layer, model_manager: ModelManager, size):
+        if layer.output_shape[-1] < size:
+            self.size = layer.output_shape[-1]
+        else:
+            self.size = size
+
         self.layer = layer
-        self.size = size
         self.model_manager = model_manager
 
         self.plt_x = []
@@ -44,7 +48,7 @@ class TopKCoverage(FCLCoverage):
         for num_neuron in range(inter_output.shape[-1]):
             neuron_outputs.append(np.mean(inter_output[..., num_neuron]))
 
-        neuron_outputs = neuron_outputs.sort(reverse=True)
+        neuron_outputs.sort(reverse=True)
         for index in range(self.size):
             for num_neuron in range(inter_output.shape[-1]):
                 if np.mean(inter_output[..., num_neuron]) == neuron_outputs[index]:

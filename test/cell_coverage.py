@@ -19,7 +19,7 @@ class CellCoverage(RLCoverage):
         self.state_manager = state_manager
         self.threshold = threshold
         self.hidden = self.state_manager.get_hidden_state(data)
-        activation = self.__get_activation()
+        activation = self.get_activation()
         self.total_feature = len((np.argwhere(activation >= np.min(activation))).tolist())
 
         self.covered_dict = defaultdict(bool)
@@ -35,7 +35,7 @@ class CellCoverage(RLCoverage):
         for index in range(self.total_feature):
             self.frequency_dict[index] = 0
 
-    def __get_activation(self):
+    def get_activation(self):
         hidden = self.hidden
         alpha1 = np.sum(np.where(hidden > 0, hidden, 0), axis=1)
         alpha2 = np.sum(np.where(hidden < 0, hidden, 0), axis=1)
@@ -54,7 +54,7 @@ class CellCoverage(RLCoverage):
 
     def update_features(self, data):
         self.hidden = self.state_manager.get_hidden_state(data)
-        activation = self.__get_activation()
+        activation = self.get_activation()
         features = (np.argwhere(activation > self.threshold)).tolist()
         for feature in features:
             self.covered_dict[feature[0]] = True

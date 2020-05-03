@@ -30,8 +30,8 @@ def main():
     symbols_sq = int(args.symbols_sq)
     seq = args.seq
     seq = re.findall(r"\d+\.?\d*", seq)
-    size_tkc = args.size_tkc
-    size_tkpc = args.size_tkpc
+    size_tkc = int(args.size_tkc)
+    size_tkpc = int(args.size_tkpc)
     mode = args.mode
 
     if model_name == 'temperature':

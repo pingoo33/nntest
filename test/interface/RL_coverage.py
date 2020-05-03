@@ -2,9 +2,9 @@ import abc
 from .coverage import Coverage
 
 
-class RLCoverage(metaclass=abc.ABCMeta, Coverage):
+class RLCoverage(metaclass=abc.ABCMeta):
     @abc.abstractmethod
-    def __get_activation(self):
+    def get_activation(self):
         pass
 
     @abc.abstractmethod
