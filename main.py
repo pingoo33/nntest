@@ -2,7 +2,10 @@ import time
 import argparse
 import re
 
-from temperature import *
+from data.mnist import MnistData
+from data.mnist_mutant_callback import MnistMutantCallback
+from model.mnist import Mnist
+from test_nn import *
 from model.temperature import Temperature
 from data.normal_mutant_callback import NormalMutantCallback
 from data.temerature import TemperatureData
@@ -44,7 +47,18 @@ def main():
         data_distribution = TemperatureDistribution()
         mutant_callback = NormalMutantCallback(data_distribution)
         data_manager = TemperatureData(mutant_callback)
-        model_manager = Temperature(data_manager, model_name)
+        model_manager = Temperature(model_name)
+
+        test = TestNN(data_manager, model_manager)
+
+        if mode == 'train':
+            test.train(fold_size)
+        else:
+            test.test(seed, threshold_tc, sec_kmnc, threshold_cc, threshold_gc, symbols_sq, seq, size_tkc, size_tkpc)
+    elif 'mnist' in model_name:
+        model_manager = Mnist(model_name)
+        mutant_callback = MnistMutantCallback(model_manager)
+        data_manager = MnistData(mutant_callback)
 
         test = TestNN(data_manager, model_manager)
 

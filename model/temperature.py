@@ -6,7 +6,6 @@ from keras import Model
 import numpy as np
 from sklearn.model_selection import KFold
 
-from data.interface.data_manager import DataManager
 from model.interface.model_manager import ModelManager
 
 
@@ -15,11 +14,8 @@ def root_mean_squared_error(y_true, y_pred):
 
 
 class Temperature(ModelManager):
-    def __init__(self, data_manager: DataManager, model_name):
-        super().__init__(data_manager, model_name)
-
-        self.x_train, self.y_train = self.data_manager.get_train_data()
-        self.x_test, self.y_test = self.data_manager.get_test_data()
+    def __init__(self, model_name):
+        super().__init__(model_name)
 
     def get_intermediate_output(self, layer, data):
         intermediate_layer_model = Model(inputs=self.model.input,
@@ -32,10 +28,8 @@ class Temperature(ModelManager):
         opt = Adadelta(lr=0.001)
         self.model.compile(optimizer=opt, loss='mean_squared_error', metrics=[root_mean_squared_error])
         self.model.summary()
-        score = self.model.evaluate(self.x_test, self.y_test, verbose=0)
-        print(self.model_name + "'s score : %.8f" % score[1])
 
-    def train_model(self, fold_size):
+    def train_model(self, fold_size, x_train, y_train, x_test, y_test):
         n_hidden = 64
         n_seq = 12
         n_input = 12
@@ -47,7 +41,7 @@ class Temperature(ModelManager):
         accuracy_list = []
 
         kfold = KFold(n_splits=fold_size, shuffle=True)
-        for train_index, test_index in kfold.split(self.x_train, self.y_train):
+        for train_index, test_index in kfold.split(x_train, y_train):
             input_layer = Input(shape=(n_seq, n_input))
 
             lstm1 = LSTM(n_hidden, return_sequences=True)(input_layer)
@@ -61,11 +55,11 @@ class Temperature(ModelManager):
             opt = Adadelta(lr=0.001)
             model.compile(optimizer=opt, loss='mean_squared_error', metrics=[root_mean_squared_error])
 
-            model.fit(x=self.x_train[train_index], y=self.y_train[train_index],
-                      validation_data=(self.x_train[test_index], self.y_train[test_index]),
+            model.fit(x=x_train[train_index], y=y_train[train_index],
+                      validation_data=(x_train[test_index], y_train[test_index]),
                       batch_size=batch_size, epochs=epochs, shuffle=True)
             model_list.append(model)
-            accuracy_list.append(model.evaluate(self.x_test, self.y_test)[1])
+            accuracy_list.append(model.evaluate(x_test, y_test)[1])
 
         acc = 0.0
         for i in range(len(model_list)):
@@ -73,8 +67,8 @@ class Temperature(ModelManager):
                 self.model = model_list[i]
                 acc = accuracy_list[i]
 
-        print("accuracy : ", str(acc))
-        self.model.save('models/kfold_' + self.model_name + '.h5')
+        print("accuracy : %s" % str(acc))
+        self.model.save('models/kfold_%s.h5' % self.model_name)
 
     def test_model(self):
         pass

@@ -18,7 +18,9 @@ class TestNN:
         self.model_manager = model_manager
 
     def train(self, fold_size):
-        self.model_manager.train_model(fold_size)
+        (x_train, y_train) = self.data_manager.get_train_data()
+        (x_test, y_test) = self.data_manager.get_test_data()
+        self.model_manager.train_model(fold_size, x_train, y_train, x_test, y_test)
 
     def __mutant_data_process(self, coverage_set, target_data):
         for data in target_data:
