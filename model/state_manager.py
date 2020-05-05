@@ -1,22 +1,21 @@
-from model.interface.model_manager import ModelManager
 import numpy as np
 import keras.backend as K
 
 
 class StateManager:
-    def __init__(self, model_manager: ModelManager, layer_index):
-        self.model_manager = model_manager
+    def __init__(self, model, layer_index):
+        self.model = model
         self.layer_index = layer_index
 
     def __evaluate(self, nodes_to_evaluate, x, y=None):
-        symb_inputs = (self.model_manager.model._feed_inputs + self.model_manager.model._feed_targets
-                       + self.model_manager.model._feed_sample_weights)
+        symb_inputs = (self.model._feed_inputs + self.model._feed_targets
+                       + self.model._feed_sample_weights)
         f = K.function(symb_inputs, nodes_to_evaluate)
-        x_, y_, sample_weight_ = self.model_manager.model._standardize_user_data(x, y)
+        x_, y_, sample_weight_ = self.model._standardize_user_data(x, y)
         return f(x_ + y_ + sample_weight_)
 
     def __get_activations_single_layer(self, x, layer_name=None):
-        nodes = [layer.output for layer in self.model_manager.model.layers if
+        nodes = [layer.output for layer in self.model.layers if
                  layer.name == layer_name or layer_name is None]
         # we process the placeholders later (Inputs node in Keras). Because there's a bug in Tensorflow.
         input_layer_outputs, layer_outputs = [], []
@@ -50,13 +49,13 @@ class StateManager:
             acx = test
         else:
             acx = self.__get_activations_single_layer(np.array([test]),
-                                                      self.model_manager.get_layer_name(layer_num - 1))
+                                                      self.model.layers[layer_num - 1].name)
 
-        units = int(int(self.model_manager.model.layers[layer_num].trainable_weights[0].shape[1]) / 4)
+        units = int(int(self.model.layers[layer_num].trainable_weights[0].shape[1]) / 4)
         # lstm_layer = model.layers[1]
-        w = self.model_manager.model.layers[layer_num].get_weights()[0]
-        u = self.model_manager.model.layers[layer_num].get_weights()[1]
-        b = self.model_manager.model.layers[layer_num].get_weights()[2]
+        w = self.model.layers[layer_num].get_weights()[0]
+        u = self.model.layers[layer_num].get_weights()[1]
+        b = self.model.layers[layer_num].get_weights()[2]
 
         w_i = w[:, :units]
         w_f = w[:, units: units * 2]

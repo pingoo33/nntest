@@ -3,6 +3,10 @@ import argparse
 import re
 
 from temperature import *
+from model.temperature import Temperature
+from data.normal_mutant_callback import NormalMutantCallback
+from data.temerature import TemperatureData
+from data.temperature_distribution import TemperatureDistribution
 
 
 def main():
@@ -36,12 +40,18 @@ def main():
     fold_size = int(args.fold_size)
     mode = args.mode
 
-    if model_name == 'temperature':
+    if 'temperature' in model_name:
+        data_distribution = TemperatureDistribution()
+        mutant_callback = NormalMutantCallback(data_distribution)
+        data_manager = TemperatureData(mutant_callback)
+        model_manager = Temperature(data_manager, model_name)
+
+        test = TestNN(data_manager, model_manager)
+
         if mode == 'train':
-            train(model_name, fold_size)
+            test.train(fold_size)
         else:
-            test(model_name, seed, threshold_tc, sec_kmnc, threshold_cc, threshold_gc, symbols_sq, seq, size_tkc,
-                 size_tkpc)
+            test.test(seed, threshold_tc, sec_kmnc, threshold_cc, threshold_gc, symbols_sq, seq, size_tkc, size_tkpc)
 
 
 if __name__ == "__main__":

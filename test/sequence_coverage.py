@@ -1,9 +1,9 @@
 from collections import defaultdict
-
-from model.interface.model_manager import ModelManager
 from model.state_manager import StateManager
 from test.interface.RL_coverage import RLCoverage
 import numpy as np
+import matplotlib
+matplotlib.use('agg')
 from matplotlib import pyplot as plt
 from saxpy.alphabet import cuts_for_asize
 from saxpy.sax import ts_to_string
@@ -12,7 +12,7 @@ import itertools
 
 
 class SequenceCoverage(RLCoverage):
-    def __init__(self, layer, model_manager: ModelManager, state_manager: StateManager, symbols, seq):
+    def __init__(self, layer, model_name, state_manager: StateManager, symbols, seq):
         self.plt_x = []
         self.plt_y_p = []
         self.plt_y_n = []
@@ -21,7 +21,7 @@ class SequenceCoverage(RLCoverage):
         self.fr_plt_y_n = []
 
         self.layer = layer
-        self.model_manager = model_manager
+        self.model_name = model_name
         self.state_manager = state_manager
         self.symbols = symbols
         self.seq = seq
@@ -129,14 +129,14 @@ class SequenceCoverage(RLCoverage):
         plt.xlabel('# of generated samples')
         plt.ylabel('coverage')
         plt.title('Positive Sequence Coverage of ' + self.layer.name)
-        plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_spc.png')
+        plt.savefig('output/' + self.model_name + '/' + self.layer.name + '_spc.png')
         plt.clf()
 
         plt.plot(self.plt_x, self.plt_y_n)
         plt.xlabel('# of generated samples')
         plt.ylabel('coverage')
         plt.title('Negative Sequence Coverage of ' + self.layer.name)
-        plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_snc.png')
+        plt.savefig('output/' + self.model_name + '/' + self.layer.name + '_snc.png')
         plt.clf()
 
     def display_frequency_graph(self):
@@ -149,7 +149,7 @@ class SequenceCoverage(RLCoverage):
         plt.ylabel('activation counts')
         plt.title(self.layer.name + ' Frequency')
         plt.xlim(-1, n_groups)
-        plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_spc_Frequency.png')
+        plt.savefig('output/' + self.model_name + '/' + self.layer.name + '_spc_Frequency.png')
         plt.clf()
 
         plt.bar(index, self.fr_plt_y_n, align='center')
@@ -158,5 +158,5 @@ class SequenceCoverage(RLCoverage):
         plt.ylabel('number of activation')
         plt.title(self.layer.name + ' Frequency')
         plt.xlim(-1, n_groups)
-        plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_snc_Frequency.png')
+        plt.savefig('output/' + self.model_name + '/' + self.layer.name + '_snc_Frequency.png')
         plt.clf()

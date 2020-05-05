@@ -28,7 +28,7 @@ class Temperature(ModelManager):
 
     def load_model(self):
         self.model = load_model('models/' + self.model_name + '.h5',
-                                custom_objects={'root_mean_squared_error': root_mean_squared_error})
+                                custom_objects={'root_mean_squared_error': root_mean_squared_error}, compile=False)
         opt = Adadelta(lr=0.001)
         self.model.compile(optimizer=opt, loss='mean_squared_error', metrics=[root_mean_squared_error])
         self.model.summary()
@@ -79,15 +79,8 @@ class Temperature(ModelManager):
     def test_model(self):
         pass
 
-    def get_layer_name(self, index):
-        layer_names = [l.name for l in self.model.layers]
-        return layer_names[index]
-
     def get_layer(self, index):
         return self.model.layers[index]
-
-    def get_all_layer(self):
-        return self.model.layers
 
     @staticmethod
     def __get_layer_type(layer_name):

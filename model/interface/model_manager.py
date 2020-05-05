@@ -10,15 +10,7 @@ class ModelManager(metaclass=abc.ABCMeta):
         self.model_name = model_name
 
     @abc.abstractmethod
-    def get_layer_name(self, index):
-        pass
-
-    @abc.abstractmethod
     def get_layer(self, index):
-        pass
-
-    @abc.abstractmethod
-    def get_all_layer(self):
         pass
 
     @abc.abstractmethod

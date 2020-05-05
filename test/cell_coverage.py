@@ -1,21 +1,23 @@
 from collections import defaultdict
 
-from model.interface.model_manager import ModelManager
 from model.state_manager import StateManager
 from test.interface.RL_coverage import RLCoverage
 import numpy as np
+import matplotlib
+
+matplotlib.use('agg')
 from matplotlib import pyplot as plt
 
 
 class CellCoverage(RLCoverage):
-    def __init__(self, layer, model_manager: ModelManager, state_manager: StateManager, threshold, data):
+    def __init__(self, layer, model_name, state_manager: StateManager, threshold, data):
         self.plt_x = []
         self.plt_y = []
         self.fr_plt_x = []
         self.fr_plt_y = []
 
         self.layer = layer
-        self.model_manager = model_manager
+        self.model_name = model_name
         self.state_manager = state_manager
         self.threshold = threshold
         self.hidden = self.state_manager.get_hidden_state(data)
@@ -92,7 +94,7 @@ class CellCoverage(RLCoverage):
         plt.xlabel('# of generated samples')
         plt.ylabel('coverage')
         plt.title('Cell Coverage of ' + self.layer.name)
-        plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_cc.png')
+        plt.savefig('output/' + self.model_name + '/' + self.layer.name + '_cc.png')
         plt.clf()
 
     def display_frequency_graph(self):
@@ -105,5 +107,5 @@ class CellCoverage(RLCoverage):
         plt.ylabel('number of activation')
         plt.title(self.layer.name + ' Frequency')
         plt.xlim(-1, n_groups)
-        plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_cc_Frequency.png')
+        plt.savefig('output/' + self.model_name + '/' + self.layer.name + '_cc_Frequency.png')
         plt.clf()
