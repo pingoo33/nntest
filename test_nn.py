@@ -1,5 +1,7 @@
 import random
 
+from data.interface.data_manager import DataManager
+from model.interface.model_manager import ModelManager
 from model.state_manager import StateManager
 from model.threshold_manager import ThresholdManager
 from test.boundary_coverage import BoundaryCoverage
@@ -13,12 +15,19 @@ from test.top_k_pattern_coverage import TopKPatternCoverage
 
 
 class TestNN:
-    def __init__(self, data_manager, model_manager):
+    def __init__(self, data_manager: DataManager, model_manager: ModelManager):
         self.data_manager = data_manager
         self.model_manager = model_manager
 
-    def train(self, fold_size):
-        self.model_manager.train_model(fold_size)
+    def kfold_train(self, fold_size):
+        (x_train, y_train) = self.data_manager.get_train_data()
+        (x_test, y_test) = self.data_manager.get_test_data()
+        self.model_manager.kfold_train_model(fold_size, x_train, y_train, x_test, y_test)
+
+    def train(self):
+        (x_train, y_train) = self.data_manager.get_train_data()
+        (x_test, y_test) = self.data_manager.get_test_data()
+        self.model_manager.train_model(x_train, y_train, x_test, y_test)
 
     def __mutant_data_process(self, coverage_set, target_data):
         for data in target_data:
