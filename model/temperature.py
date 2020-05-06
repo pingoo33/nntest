@@ -54,7 +54,7 @@ class Temperature(ModelManager):
                   validation_data=(x_test, y_test),
                   batch_size=batch_size, epochs=epochs, shuffle=True)
 
-        self.model.save('models/%s.h5' % self.model_name)
+        model.save('models/%s.h5' % self.model_name)
 
     def kfold_train_model(self, fold_size, x_train, y_train, x_test, y_test):
         n_hidden = 64

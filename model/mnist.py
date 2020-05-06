@@ -27,7 +27,7 @@ class Mnist(ModelManager):
         model.fit(x_train, y_train, epochs=3,
                   validation_data=(x_test, y_test))
 
-        self.model.save('models/%s.h5' % self.model_name)
+        model.save('models/%s.h5' % self.model_name)
 
     def kfold_train_model(self, fold_size, x_train, y_train, x_test, y_test):
         model_list = []
