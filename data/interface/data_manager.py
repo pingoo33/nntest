@@ -2,6 +2,12 @@ import abc
 
 
 class DataManager(metaclass=abc.ABCMeta):
+    def __init__(self):
+        self.x_train = None
+        self.y_train = None
+        self.x_test = None
+        self.y_test = None
+
     @abc.abstractmethod
     def load_data(self):
         pass
