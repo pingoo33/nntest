@@ -28,7 +28,7 @@ class TestNN:
         (x_train, y_train) = self.data_manager.get_train_data()
         (x_test, y_test) = self.data_manager.get_test_data()
         self.model_manager.train_model(x_train, y_train, x_test, y_test)
-
+        
     def __mutant_data_process(self, coverage_set, target_data):
         for data in target_data:
             for coverage in coverage_set:
