@@ -31,22 +31,23 @@ class TestNN:
 
     def __mutant_data_process(self, coverage_set, target_data):
         for data in target_data:
-            for coverage in coverage_set:
-                # TODO: implement oracle
-                # before_output = model_manager.get_prob(data)
-                generated_data, _ = self.data_manager.mutant_data(data)
+            # TODO: implement oracle
+            # before_output = model_manager.get_prob(data)
+            generated_data, _ = self.data_manager.mutant_data(data)
 
+            for coverage in coverage_set:
                 if not (data is None):
                     # after_output = model_manager.get_prob(data)
                     self.data_manager.update_sample()
 
                     coverage.update_features(data)
-                    coverage.update_graph(self.data_manager.get_num_samples())
+                    coverage.update_graph(self.data_manager.get_num_samples() / len(coverage_set))
 
         for coverage in coverage_set:
             coverage.update_frequency_graph()
             coverage.display_graph()
             coverage.display_frequency_graph()
+            coverage.display_stat()
 
     def __lstm_test(self, target_data, threshold_cc, threshold_gc, symbols_sq, seq):
         model = self.model_manager.model
@@ -56,7 +57,6 @@ class TestNN:
 
         init_data = target_data[15]
         layer = lstm_layers[0]
-        print(indices[0])
         state_manager = StateManager(model, indices[0])
         coverage_set = [CellCoverage(layer, model_name, state_manager, threshold_cc, init_data),
                         GateCoverage(layer, model_name, state_manager, threshold_gc, init_data),

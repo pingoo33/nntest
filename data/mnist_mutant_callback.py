@@ -20,6 +20,14 @@ class MnistMutantCallback(MutantCallback):
     def get_next_input_by_gradient(self, f, nodes_names, epsilon, data, last_activation, step):
         gd = self.model_manager.cal_gradient(f, np.array([data]), np.array([last_activation]), nodes_names)
         gd = np.squeeze(list(gd.values())[0])
+        if np.shape(data) != np.shape(gd):
+            step = step - 1
+            if step <= 0:
+                print("found a test case of shape %s!" % (str(data.shape)))
+                return data
+            else:
+                return self.get_next_input_by_gradient(f, nodes_names, epsilon, data, last_activation, step)
+
         new_test = data + epsilon * np.sign(gd)
         new_test = np.clip(new_test, 0, 1)
         last_activation = self.model_manager.get_prob(data)

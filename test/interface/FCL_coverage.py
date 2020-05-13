@@ -36,3 +36,7 @@ class FCLCoverage(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def display_frequency_graph(self):
         pass
+
+    @abc.abstractmethod
+    def display_stat(self):
+        pass

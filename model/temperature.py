@@ -42,8 +42,8 @@ class Temperature(ModelManager):
         lstm1 = LSTM(n_hidden, return_sequences=True)(input_layer)
         rnn_outputs = LSTM(n_hidden, activation='tanh')(lstm1)
 
-        rnn_outputs = Dense(n_output * 4)(rnn_outputs)
-        outputs = Dense(n_output, activation='linear')(rnn_outputs)
+        outputs = Dense(n_output * 4)(rnn_outputs)
+        outputs = Dense(n_output, activation='linear')(outputs)
 
         model = Model(inputs=input_layer, outputs=outputs)
 
@@ -95,7 +95,7 @@ class Temperature(ModelManager):
                 acc = accuracy_list[i]
 
         print("accuracy : %s" % str(acc))
-        self.model.save('models/kfold_%s.h5' % self.model_name)
+        self.model.save('models/%s.h5' % self.model_name)
 
     def test_model(self):
         pass

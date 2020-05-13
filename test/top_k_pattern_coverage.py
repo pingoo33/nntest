@@ -84,3 +84,6 @@ class TopKPatternCoverage(FCLCoverage):
 
     def display_frequency_graph(self):
         pass
+
+    def display_stat(self):
+        pass

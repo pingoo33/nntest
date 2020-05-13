@@ -1,3 +1,4 @@
+import random
 from collections import defaultdict
 
 from model.interface.model_manager import ModelManager
@@ -91,8 +92,12 @@ class KMultisectionCoverage(FCLCoverage):
     def update_frequency_graph(self):
         for num_neuron in range(self.layer.output_shape[-1]):
             self.fr_plt_x.append(num_neuron)
-            for index, dict in enumerate(self.frequency_dicts):
-                self.fr_plt_y[index].append(dict[num_neuron])
+
+        for index in range(self.num_section):
+            temp = []
+            for num_neuron in range(self.layer.output_shape[-1]):
+                temp.append(self.frequency_dicts[index][num_neuron])
+            self.fr_plt_y[index] = temp
 
     def display_graph(self):
         plt.plot(self.plt_x, self.plt_y)
@@ -108,7 +113,11 @@ class KMultisectionCoverage(FCLCoverage):
 
         plt.bar(index, self.fr_plt_y[0], align='center')
         for i in range(1, self.num_section):
-            plt.bar(index, self.fr_plt_y[i], align='center', color=(i, i, i, i),
+            r = random.random()
+            g = random.random()
+            b = random.random()
+            a = random.random()
+            plt.bar(index, self.fr_plt_y[i], align='center', color=(r, g, b, a),
                     bottom=self.fr_plt_y[i - 1])
 
         plt.xlabel('features')
@@ -117,3 +126,11 @@ class KMultisectionCoverage(FCLCoverage):
         plt.xlim(-1, n_groups)
         plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_bc_Frequency.png')
         plt.clf()
+
+    def display_stat(self):
+        mean, variation = self.calculate_variation(self.fr_plt_y)
+
+        f = open('output/%s_%s_tc.txt' % (self.model_manager.model_name, self.layer.name), 'w')
+        f.write('mean: %f' % mean)
+        f.write('variation: %f' % variation)
+        f.close()

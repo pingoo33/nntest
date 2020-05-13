@@ -3,6 +3,7 @@ from model.state_manager import StateManager
 from test.interface.RL_coverage import RLCoverage
 import numpy as np
 import matplotlib
+
 matplotlib.use('agg')
 from matplotlib import pyplot as plt
 from saxpy.alphabet import cuts_for_asize
@@ -71,7 +72,7 @@ class SequenceCoverage(RLCoverage):
             if self.covered_dict_n[index] is True:
                 covered_number_n += 1
 
-        return covered_number_p, covered_number_p / float(self.total_feature)\
+        return covered_number_p, covered_number_p / float(self.total_feature) \
             , covered_number_n, covered_number_n / float(self.total_feature)
 
     def update_features(self, data):
@@ -160,3 +161,14 @@ class SequenceCoverage(RLCoverage):
         plt.xlim(-1, n_groups)
         plt.savefig('output/' + self.model_name + '/' + self.layer.name + '_snc_Frequency.png')
         plt.clf()
+
+    def display_stat(self):
+        mean_p, variation_p = self.calculate_variation(self.fr_plt_y_p)
+        mean_n, variation_n = self.calculate_variation(self.fr_plt_y_n)
+
+        f = open('output/%s_%s_tc.txt' % (self.model_name, self.layer.name), 'w')
+        f.write('mean_p: %f' % mean_p)
+        f.write('variation_p: %f' % variation_p)
+        f.write('mean_n: %f' % mean_n)
+        f.write('variation_n: %f' % variation_n)
+        f.close()

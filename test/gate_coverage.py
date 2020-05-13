@@ -104,3 +104,11 @@ class GateCoverage(RLCoverage):
         plt.xlim(-1, n_groups)
         plt.savefig('output/' + self.model_name + '/' + self.layer.name + '_gc_Frequency.png')
         plt.clf()
+
+    def display_stat(self):
+        mean, variation = self.calculate_variation(self.fr_plt_y)
+
+        f = open('output/%s_%s_tc.txt' % (self.model_name, self.layer.name), 'w')
+        f.write('mean: %f' % mean)
+        f.write('variation: %f' % variation)
+        f.close()

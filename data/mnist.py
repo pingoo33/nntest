@@ -27,7 +27,8 @@ class MnistData(DataManager):
         self.y_test = to_categorical(self.y_test)
 
     def mutant_data(self, data):
-        pass
+        new_data = self.mutant_callback.mutant_data(data)
+        return new_data, None
 
     def get_train_data(self):
         return self.x_train, self.y_train

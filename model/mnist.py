@@ -16,34 +16,52 @@ class Mnist(ModelManager):
         return self.model.layers[index]
 
     def train_model(self, x_train, y_train, x_test, y_test):
-        model = Sequential()
-        # input_shape = (batch_size, timesteps, input_dim)
-        model.add(LSTM(128, input_shape=(x_train.shape[1:]), return_sequences=True))
-        model.add(LSTM(128))
-        model.add(Dense(32, activation='relu'))
-        model.add(Dense(10, activation='softmax'))
+        n_hidden = 128
+        n_output1 = 32
+        n_output2 = 10
+        epochs = 3
+        row, col = x_train.shape[1:]
+
+        input_layer = Input(shape=(row, col))
+
+        lstm1 = LSTM(n_hidden, return_sequences=True)(input_layer)
+        rnn_outputs = LSTM(n_hidden, activation='tanh')(lstm1)
+
+        outputs = Dense(n_output1, activation='relu')(rnn_outputs)
+        outputs = Dense(n_output2, activation='softmax')(outputs)
+
+        model = Model(inputs=input_layer, outputs=outputs)
+
         opt = Adam(lr=1e-3, decay=1e-5)
-        model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
-        model.fit(x_train, y_train, epochs=3,
-                  validation_data=(x_test, y_test))
+        model.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy'])
+        model.fit(x_train, y_train, epochs=epochs, validation_data=(x_test, y_test))
 
         model.save('models/%s.h5' % self.model_name)
 
     def kfold_train_model(self, fold_size, x_train, y_train, x_test, y_test):
+        n_hidden = 128
+        n_output1 = 32
+        n_output2 = 10
+        epochs = 3
+        row, col = x_train.shape[1:]
+
         model_list = []
         accuracy_list = []
 
         kfold = KFold(n_splits=fold_size, shuffle=True)
         for train_index, test_index in kfold.split(x_train, y_train):
-            model = Sequential()
-            # input_shape = (batch_size, timesteps, input_dim)
-            model.add(LSTM(128, input_shape=(x_train.shape[1:]), return_sequences=True))
-            model.add(LSTM(128))
-            model.add(Dense(32, activation='relu'))
-            model.add(Dense(10, activation='softmax'))
+            input_layer = Input(shape=(row, col))
+
+            lstm1 = LSTM(n_hidden, return_sequences=True)(input_layer)
+            rnn_outputs = LSTM(n_hidden, activation='tanh')(lstm1)
+
+            outputs = Dense(n_output1, activation='relu')(rnn_outputs)
+            outputs = Dense(n_output2, activation='softmax')(outputs)
+
+            model = Model(inputs=input_layer, outputs=outputs)
             opt = Adam(lr=1e-3, decay=1e-5)
-            model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
-            model.fit(x_train[train_index], y_train[train_index], epochs=3,
+            model.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy'])
+            model.fit(x_train[train_index], y_train[train_index], epochs=epochs,
                       validation_data=(x_train[test_index], y_train[test_index]))
             model_list.append(model)
             accuracy_list.append(model.evaluate(x_test, y_test)[1])
@@ -55,7 +73,7 @@ class Mnist(ModelManager):
                 acc = accuracy_list[i]
 
         print("accuracy : %s" % str(acc))
-        self.model.save('models/kfold_%s.h5' % self.model_name)
+        self.model.save('models/%s.h5' % self.model_name)
 
     def test_model(self):
         pass
@@ -66,7 +84,7 @@ class Mnist(ModelManager):
         return intermediate_layer_model.predict(np.expand_dims(data, axis=0))
 
     def load_model(self):
-        self.model = load_model('models/mnist_lstm.h5')
+        self.model = load_model('models/%s.h5' % self.model_name)
         opt = Adam(lr=1e-3, decay=1e-5)
         self.model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
         self.model.summary()
