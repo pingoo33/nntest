@@ -124,7 +124,7 @@ class KMultisectionCoverage(FCLCoverage):
         plt.ylabel('number of activation')
         plt.title(self.layer.name + ' Frequency')
         plt.xlim(-1, n_groups)
-        plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_bc_Frequency.png')
+        plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_kc_Frequency.png')
         plt.clf()
 
     def display_stat(self):
