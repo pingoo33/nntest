@@ -4,14 +4,14 @@ from data.interface.data_manager import DataManager
 from model.interface.model_manager import ModelManager
 from model.state_manager import StateManager
 from model.threshold_manager import ThresholdManager
-from test.boundary_coverage import BoundaryCoverage
-from test.cell_coverage import CellCoverage
-from test.gate_coverage import GateCoverage
-from test.k_multisection_coverage import KMultisectionCoverage
-from test.sequence_coverage import SequenceCoverage
-from test.threshold_coverage import ThresholdCoverage
-from test.top_k_coverage import TopKCoverage
-from test.top_k_pattern_coverage import TopKPatternCoverage
+from test.fc.boundary_coverage import BoundaryCoverage
+from test.lstm.cell_coverage import CellCoverage
+from test.lstm.gate_coverage import GateCoverage
+from test.fc.k_multisection_coverage import KMultisectionCoverage
+from test.lstm.sequence_coverage import SequenceCoverage
+from test.fc.threshold_coverage import ThresholdCoverage
+from test.fc.top_k_coverage import TopKCoverage
+from test.fc_pattern.top_k_pattern_coverage import TopKPatternCoverage
 
 
 class TestNN:
@@ -64,7 +64,7 @@ class TestNN:
 
         self.__mutant_data_process(coverage_set, target_data)
 
-    def __fc_test(self, target_data, threshold_tc, sec_kmnc, size_tkc, size_tkpc):
+    def __fc_test(self, target_data, threshold_tc, sec_kmnc, size_tkc):
         _, other_layers = self.model_manager.get_fc_layer()
 
         for layer in other_layers:
@@ -76,6 +76,7 @@ class TestNN:
 
             self.__mutant_data_process(coverage_set, target_data)
 
+    def __pattern_test(self, target_data, size_tkpc):
         coverage_set = [TopKPatternCoverage(self.model_manager, size_tkpc)]
 
         self.__mutant_data_process(coverage_set, target_data)
@@ -89,4 +90,6 @@ class TestNN:
 
         self.__lstm_test(target_data, threshold_cc, threshold_gc, symbols_sq, seq)
 
-        self.__fc_test(target_data, threshold_tc, sec_kmnc, size_tkc, size_tkpc)
+        self.__fc_test(target_data, threshold_tc, sec_kmnc, size_tkc)
+
+        self.__pattern_test(target_data, size_tkpc)

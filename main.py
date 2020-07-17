@@ -2,14 +2,14 @@ import time
 import argparse
 import re
 
-from data.mnist import MnistData
-from data.mnist_mutant_callback import MnistMutantCallback
+from data.mnist.data import MnistData
+from data.mnist.mutant_callback import MnistMutantCallback
 from model.mnist import Mnist
 from test_nn import *
 from model.temperature import Temperature
-from data.normal_mutant_callback import NormalMutantCallback
-from data.temerature import TemperatureData
-from data.temperature_distribution import TemperatureDistribution
+from data.temperature.normal_mutant_callback import NormalMutantCallback
+from data.temperature.data import TemperatureData
+from data.temperature.distribution import TemperatureDistribution
 
 
 def main():

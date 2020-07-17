@@ -12,7 +12,7 @@ class MnistMutantCallback(MutantCallback):
         f, nodes_names = self.model_manager.get_gradients_function()
 
         epsilon = random.uniform(0.05, 1)
-        step = random.randint(1, 5)
+        step = 2
         last_activation = self.model_manager.get_prob(data)
 
         return self.get_next_input_by_gradient(f, nodes_names, epsilon, data, last_activation, step)
