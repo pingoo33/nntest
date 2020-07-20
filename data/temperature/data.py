@@ -4,16 +4,18 @@ from sklearn.preprocessing import RobustScaler
 import random
 from data.interface.data_manager import DataManager
 from data.interface.mutant_callback import MutantCallback
+from data.interface.oracle import Oracle
 
 
 class TemperatureData(DataManager):
-    def __init__(self, mutant_callback: MutantCallback):
+    def __init__(self, mutant_callback: MutantCallback, oracle: Oracle):
         super().__init__()
         self.mutant_callback = mutant_callback
+        self.oracle = oracle
         self.raw = []
         self.num_adv = 0
+        self.advs = []
         self.num_samples = 0
-        self.perturbations = []
         self.scaler = None
         self.load_data()
 
@@ -76,15 +78,13 @@ class TemperatureData(DataManager):
     def get_num_samples(self):
         return self.num_samples
 
-    # def update_sample(self, output2, output1, m, o):
-    def update_sample(self):
-        # error = abs(output2 - output1)
+    def update_sample(self, src_label, dest_label, src, dest):
+        if src_label != dest_label and self.oracle.pass_oracle(src, dest):
+            self.num_adv += 1
+            self.advs.append(dest)
 
-        # if error >= 0.0001 and o == True:
-        #     self.num_adv += 1s
-        #     self.perturbations.append(m)
         self.num_samples += 1
-        # self.display_success_rate()
+        self.display_success_rate()
 
     def display_samples(self):
         print("%s samples are considered" % self.num_samples)
@@ -92,9 +92,3 @@ class TemperatureData(DataManager):
     def display_success_rate(self):
         print("%s samples, within which there are %s adversarial examples" % (self.num_samples, self.num_adv))
         print("the rate of adversarial examples is %.2f\n" % (self.num_adv / self.num_samples))
-
-    def display_perturbations(self):
-        if self.num_adv > 0:
-            print(
-                "the average perturbation of the adversarial examples is %s" % (sum(self.perturbations) / self.num_adv))
-            print("the smallest perturbation of the adversarial examples is %s" % (min(self.perturbations)))

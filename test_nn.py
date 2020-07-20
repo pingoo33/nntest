@@ -32,13 +32,13 @@ class TestNN:
     def __mutant_data_process(self, coverage_set, target_data):
         for data in target_data:
             # TODO: implement oracle
-            # before_output = model_manager.get_prob(data)
+            before_output = self.model_manager.get_prob(data)
             generated_data, _ = self.data_manager.mutant_data(data)
 
             for coverage in coverage_set:
                 if not (data is None):
-                    # after_output = model_manager.get_prob(data)
-                    self.data_manager.update_sample()
+                    after_output = self.model_manager.get_prob(generated_data)
+                    self.data_manager.update_sample(before_output, after_output, data, generated_data)
 
                     coverage.update_features(data)
                     coverage.update_graph(self.data_manager.get_num_samples() / len(coverage_set))

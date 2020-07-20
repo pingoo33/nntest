@@ -29,5 +29,5 @@ class DataManager(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def update_sample(self):
+    def update_sample(self, src_label, dest_label, src, dest):
         pass
