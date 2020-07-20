@@ -116,7 +116,10 @@ class Cifar10(ModelManager):
         indices = []
         layers = []
         for index, layer in enumerate(self.model.layers):
-            if 'input' in layer.name or 'concatenate' in layer.name or index == len(self.model.layers) - 1:
+            if 'input' in layer.name \
+                    or 'concatenate' in layer.name \
+                    or index == len(self.model.layers) - 1 \
+                    or 'flatten' in layer.name:
                 continue
             layer_type = self.__get_layer_type(layer.name)
             if layer_type == "lstm":
@@ -128,7 +131,10 @@ class Cifar10(ModelManager):
         indices = []
         layers = []
         for index, layer in enumerate(self.model.layers):
-            if 'input' in layer.name or 'concatenate' in layer.name or index == len(self.model.layers) - 1:
+            if 'input' in layer.name \
+                    or 'concatenate' in layer.name \
+                    or index == len(self.model.layers) - 1 \
+                    or 'flatten' in layer.name:
                 continue
             layer_type = self.__get_layer_type(layer.name)
             if layer_type != "lstm":
