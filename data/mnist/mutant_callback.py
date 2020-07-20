@@ -2,6 +2,11 @@ from data.interface.mutant_callback import MutantCallback
 import random
 import numpy as np
 from model.interface.model_manager import ModelManager
+import keras.backend as K
+
+
+def root_mean_squared_error(y_true, y_pred):
+    return K.sqrt(K.mean(K.square(y_pred - y_true), axis=-1))
 
 
 class MnistMutantCallback(MutantCallback):

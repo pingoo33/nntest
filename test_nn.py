@@ -56,8 +56,8 @@ class TestNN:
         indices, lstm_layers = self.model_manager.get_lstm_layer()
 
         init_data = target_data[15]
-        layer = lstm_layers[0]
-        state_manager = StateManager(model, indices[0])
+        layer = lstm_layers[-1]
+        state_manager = StateManager(model, indices[-1])
         coverage_set = [CellCoverage(layer, model_name, state_manager, threshold_cc, init_data),
                         GateCoverage(layer, model_name, state_manager, threshold_gc, init_data),
                         SequenceCoverage(layer, model_name, state_manager, symbols_sq, seq)]

@@ -8,11 +8,8 @@ from data.interface.mutant_callback import MutantCallback
 
 class TemperatureData(DataManager):
     def __init__(self, mutant_callback: MutantCallback):
+        super().__init__()
         self.mutant_callback = mutant_callback
-        self.x_train = None
-        self.y_train = None
-        self.x_test = None
-        self.y_test = None
         self.raw = []
         self.num_adv = 0
         self.num_samples = 0

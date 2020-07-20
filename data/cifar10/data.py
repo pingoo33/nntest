@@ -1,11 +1,11 @@
-from keras.datasets import mnist
+from keras.datasets import cifar10
 from keras.utils import to_categorical
 
 from data.interface.data_manager import DataManager
 from data.interface.mutant_callback import MutantCallback
 
 
-class MnistData(DataManager):
+class Cifar10Data(DataManager):
     def __init__(self, mutant_callback: MutantCallback):
         super().__init__()
         self.mutant_callback = mutant_callback
@@ -17,7 +17,7 @@ class MnistData(DataManager):
         self.load_data()
 
     def load_data(self):
-        (self.x_train, self.y_train), (self.x_test, self.y_test) = mnist.load_data()
+        (self.x_train, self.y_train), (self.x_test, self.y_test) = cifar10.load_data()
         self.x_train = self.x_train.astype('float32') / 255
         self.x_test = self.x_test.astype('float32') / 255
         self.y_train = to_categorical(self.y_train)

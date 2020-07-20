@@ -2,9 +2,19 @@ import time
 import argparse
 import re
 
+from data.atomic.data import AtomicData
+from data.atomic.distribution import AtomicDistribution
+from data.atomic.mutant_callback import AtomicMutantCallback
+from data.cifar10.data import Cifar10Data
+from data.cifar10.mutant_callback import Cifar10MutantCallback
 from data.mnist.data import MnistData
+from data.mnist.data_cnn import MnistCNNData
 from data.mnist.mutant_callback import MnistMutantCallback
+from model.atomic import Atomic
+from model.cifar10 import Cifar10
 from model.mnist import Mnist
+from model.mnist_cnn import MnistCNN
+from model.resnet import Resnet
 from test_nn import *
 from model.temperature import Temperature
 from data.temperature.normal_mutant_callback import NormalMutantCallback
@@ -58,10 +68,67 @@ def main():
                 test.train()
         else:
             test.test(seed, threshold_tc, sec_kmnc, threshold_cc, threshold_gc, symbols_sq, seq, size_tkc, size_tkpc)
+    elif 'mnist_cnn' in model_name:
+        model_manager = MnistCNN(model_name)
+        mutant_callback = MnistMutantCallback(model_manager)
+        data_manager = MnistCNNData(mutant_callback)
+
+        test = TestNN(data_manager, model_manager)
+
+        if mode == 'train':
+            if 'kfold' in model_name:
+                test.kfold_train(fold_size)
+            else:
+                test.train()
+        else:
+            test.test(seed, threshold_tc, sec_kmnc, threshold_cc, threshold_gc, symbols_sq, seq, size_tkc, size_tkpc)
     elif 'mnist' in model_name:
         model_manager = Mnist(model_name)
         mutant_callback = MnistMutantCallback(model_manager)
         data_manager = MnistData(mutant_callback)
+
+        test = TestNN(data_manager, model_manager)
+
+        if mode == 'train':
+            if 'kfold' in model_name:
+                test.kfold_train(fold_size)
+            else:
+                test.train()
+        else:
+            test.test(seed, threshold_tc, sec_kmnc, threshold_cc, threshold_gc, symbols_sq, seq, size_tkc, size_tkpc)
+    elif 'atomic' in model_name:
+        model_manager = Atomic(model_name)
+        data_distribution = AtomicDistribution()
+        mutant_callback = AtomicMutantCallback(data_distribution)
+        data_manager = AtomicData(mutant_callback)
+
+        test = TestNN(data_manager, model_manager)
+
+        if mode == 'train':
+            if 'kfold' in model_name:
+                test.kfold_train(fold_size)
+            else:
+                test.train()
+        else:
+            test.test(seed, threshold_tc, sec_kmnc, threshold_cc, threshold_gc, symbols_sq, seq, size_tkc, size_tkpc)
+    elif 'cifar10' in model_name:
+        model_manager = Cifar10(model_name)
+        mutant_callback = Cifar10MutantCallback(model_manager)
+        data_manager = Cifar10Data(mutant_callback)
+
+        test = TestNN(data_manager, model_manager)
+
+        if mode == 'train':
+            if 'kfold' in model_name:
+                test.kfold_train(fold_size)
+            else:
+                test.train()
+        else:
+            test.test(seed, threshold_tc, sec_kmnc, threshold_cc, threshold_gc, symbols_sq, seq, size_tkc, size_tkpc)
+    elif 'resnet' in model_name:
+        model_manager = Resnet(model_name)
+        mutant_callback = Cifar10MutantCallback(model_manager)
+        data_manager = Cifar10Data(mutant_callback)
 
         test = TestNN(data_manager, model_manager)
 

@@ -7,12 +7,12 @@ class StateManager:
         self.model = model
         self.layer_index = layer_index
 
-    def __evaluate(self, nodes_to_evaluate, x, y=None):
+    def __evaluate(self, nodes_to_evaluate, x):
         symb_inputs = (self.model._feed_inputs + self.model._feed_targets
                        + self.model._feed_sample_weights)
         f = K.function(symb_inputs, nodes_to_evaluate)
-        x_, y_, sample_weight_ = self.model._standardize_user_data(x, y)
-        return f(x_ + y_ + sample_weight_)
+        x_, _, _ = self.model._standardize_user_data(x, None)
+        return f(x_)
 
     def __get_activations_single_layer(self, x, layer_name=None):
         nodes = [layer.output for layer in self.model.layers if

@@ -1,7 +1,7 @@
-from data.interface.data_distribution_manager import DataDistribution
-import os
 import numpy as np
 import pandas as pd
+
+from data.interface.data_distribution_manager import DataDistribution
 
 
 class TemperatureDistribution(DataDistribution):

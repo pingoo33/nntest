@@ -1,10 +1,11 @@
-from keras.layers import Dense, Input, LSTM
+import keras.backend as K
+import numpy as np
+from tensorflow import keras
+from keras import Model
 from keras.models import load_model
 from keras.optimizers import Adadelta
-import keras.backend as K
-from keras import Model
-import numpy as np
 from sklearn.model_selection import KFold
+from tensorflow.keras.layers import Dense, LSTM
 
 from model.interface.model_manager import ModelManager
 
@@ -37,7 +38,7 @@ class Temperature(ModelManager):
         epochs = 200
         batch_size = 32
 
-        input_layer = Input(shape=(n_seq, n_input))
+        input_layer = keras.Input(shape=(n_seq, n_input))
 
         lstm1 = LSTM(n_hidden, return_sequences=True)(input_layer)
         rnn_outputs = LSTM(n_hidden, activation='tanh')(lstm1)
@@ -45,7 +46,7 @@ class Temperature(ModelManager):
         outputs = Dense(n_output * 4)(rnn_outputs)
         outputs = Dense(n_output, activation='linear')(outputs)
 
-        model = Model(inputs=input_layer, outputs=outputs)
+        model = keras.Model(inputs=input_layer, outputs=outputs)
 
         opt = Adadelta(lr=0.001)
         model.compile(optimizer=opt, loss='mean_squared_error', metrics=[root_mean_squared_error])
@@ -69,7 +70,7 @@ class Temperature(ModelManager):
 
         kfold = KFold(n_splits=fold_size, shuffle=True)
         for train_index, test_index in kfold.split(x_train, y_train):
-            input_layer = Input(shape=(n_seq, n_input))
+            input_layer = keras.Input(shape=(n_seq, n_input))
 
             lstm1 = LSTM(n_hidden, return_sequences=True)(input_layer)
             rnn_outputs = LSTM(n_hidden, activation='tanh')(lstm1)
@@ -77,7 +78,7 @@ class Temperature(ModelManager):
             rnn_outputs = Dense(n_output * 4)(rnn_outputs)
             outputs = Dense(n_output, activation='linear')(rnn_outputs)
 
-            model = Model(inputs=input_layer, outputs=outputs)
+            model = keras.Model(inputs=input_layer, outputs=outputs)
 
             opt = Adadelta(lr=0.001)
             model.compile(optimizer=opt, loss='mean_squared_error', metrics=[root_mean_squared_error])
