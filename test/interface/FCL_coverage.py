@@ -40,3 +40,7 @@ class FCLCoverage(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def display_stat(self):
         pass
+
+    @abc.abstractmethod
+    def get_name(self):
+        pass

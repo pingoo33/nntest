@@ -72,23 +72,24 @@ class TemperatureData(DataManager):
         new_data = self.mutant_callback.mutant_data(origin_data)
 
         normalized_new_data = self.normalize(new_data)
-        data[random_idx] = np.array(normalized_new_data)
-        return data, new_data
+
+        new = np.array(data)
+        new[random_idx] = np.array(normalized_new_data)
+
+        return new, new_data
 
     def get_num_samples(self):
         return self.num_samples
 
     def update_sample(self, src_label, dest_label, src, dest):
-        if src_label != dest_label and self.oracle.pass_oracle(src, dest):
+        if abs(src_label - dest_label) > 0.09 and self.oracle.pass_oracle(src, dest):
             self.num_adv += 1
             self.advs.append(dest)
 
         self.num_samples += 1
-        self.display_success_rate()
 
-    def display_samples(self):
-        print("%s samples are considered" % self.num_samples)
+    def get_num_advs(self):
+        return self.num_adv
 
-    def display_success_rate(self):
-        print("%s samples, within which there are %s adversarial examples" % (self.num_samples, self.num_adv))
-        print("the rate of adversarial examples is %.2f\n" % (self.num_adv / self.num_samples))
+    def save_advs(self):
+        pass

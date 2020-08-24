@@ -5,13 +5,14 @@ from model.threshold_manager import ThresholdManager
 from test.interface.FCL_coverage import FCLCoverage
 import numpy as np
 import matplotlib
+
 matplotlib.use('agg')
 from matplotlib import pyplot as plt
 
 
 class BoundaryCoverage(FCLCoverage):
     def __init__(self, layer, model_manager: ModelManager, threshold_manager: ThresholdManager):
-
+        self.name = "BoundaryCoverage"
         self.plt_x = []
         self.plt_y = []
         self.fr_plt_x = []
@@ -84,7 +85,7 @@ class BoundaryCoverage(FCLCoverage):
         _, coverage = self.calculate_coverage()
         self.plt_x.append(num_samples)
         self.plt_y.append(coverage)
-        print("%s layer boundary coverage : %.8f" % (self.layer.name, coverage))
+        # print("%s layer boundary coverage : %.8f" % (self.layer.name, coverage))
 
     def update_frequency_graph(self):
         for num_neuron in range(self.layer.output_shape[-1]):
@@ -115,9 +116,12 @@ class BoundaryCoverage(FCLCoverage):
         plt.clf()
 
     def display_stat(self):
-        mean, variation = self.calculate_variation(self.fr_plt_y)
+        mean, variation = self.calculate_variation(np.concatenate((self.max_fr_plt_y, self.min_fr_plt_y), axis=0))
 
         f = open('output/%s_%s_tc.txt' % (self.model_manager.model_name, self.layer.name), 'w')
         f.write('mean: %f' % mean)
         f.write('variation: %f' % variation)
         f.close()
+
+    def get_name(self):
+        return self.name

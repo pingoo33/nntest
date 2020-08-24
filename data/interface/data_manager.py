@@ -13,6 +13,10 @@ class DataManager(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
+    def save_advs(self):
+        pass
+
+    @abc.abstractmethod
     def mutant_data(self, data):
         pass
 
@@ -26,6 +30,10 @@ class DataManager(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_num_samples(self):
+        pass
+
+    @abc.abstractmethod
+    def get_num_advs(self):
         pass
 
     @abc.abstractmethod

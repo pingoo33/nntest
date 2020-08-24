@@ -1,5 +1,4 @@
 from collections import defaultdict
-
 from model.state_manager import StateManager
 from test.interface.RL_coverage import RLCoverage
 import numpy as np
@@ -7,17 +6,18 @@ import matplotlib
 
 matplotlib.use('agg')
 from matplotlib import pyplot as plt
-import pandas as pd
+from saxpy.alphabet import cuts_for_asize
+from saxpy.sax import ts_to_string
+from saxpy.znorm import znorm
+import itertools
 
 
-class CellCoverage(RLCoverage):
-
+class NegativeSequenceCoverage(RLCoverage):
     def save_feature(self):
-        activations = pd.DataFrame(self.activates)
-        activations.to_csv('cc_activates.csv', mode='w')
+        pass
 
-    def __init__(self, layer, model_name, state_manager: StateManager, threshold, data):
-        self.name = "CellCoverage"
+    def __init__(self, layer, model_name, state_manager: StateManager, symbols, seq):
+        self.name = "NegativeSequenceCoverage"
         self.plt_x = []
         self.plt_y = []
         self.fr_plt_x = []
@@ -26,16 +26,24 @@ class CellCoverage(RLCoverage):
         self.layer = layer
         self.model_name = model_name
         self.state_manager = state_manager
-        self.threshold = threshold
-        self.hidden = self.state_manager.get_hidden_state(data)
-        activation = self.get_activation()
-        self.total_feature = len((np.argwhere(activation >= np.min(activation))).tolist())
+        self.symbols = symbols
+        self.seq = seq
+        self.hidden = None
+        self.__init_feature()
 
         self.covered_dict = defaultdict(bool)
         self.frequency_dict = defaultdict(int)
         self.__init_covered_dict()
         self.__init_frequency_dict()
-        self.activates = []
+
+    def __init_feature(self):
+        t1 = int(self.seq[0])
+        t2 = int(self.seq[1])
+        self.indices = slice(t1, t2 + 1)
+        alpha_list = [chr(i) for i in range(97, 97 + int(self.symbols))]
+        symbol = ''.join(alpha_list)
+        self.feature = list(itertools.product(symbol, repeat=t2 - t1 + 1))
+        self.total_feature = len(self.feature)
 
     def __init_covered_dict(self):
         for index in range(self.total_feature):
@@ -47,35 +55,35 @@ class CellCoverage(RLCoverage):
 
     def get_activation(self):
         hidden = self.hidden
-        alpha1 = np.sum(np.where(hidden > 0, hidden, 0), axis=1)
-        alpha2 = np.sum(np.where(hidden < 0, hidden, 0), axis=1)
-        alpha11 = np.insert(np.delete(alpha1, -1, axis=0), 0, 0, axis=0)
-        alpha22 = np.insert(np.delete(alpha2, -1, axis=0), 0, 0, axis=0)
-        alpha = np.abs(alpha1 - alpha11) + np.abs(alpha2 - alpha22)
+        alpha = np.sum(np.where(hidden < 0, hidden, 0), axis=1)
         return alpha
 
     def calculate_coverage(self):
-        covered_number_neurons = 0
+        covered_number = 0
+
         for index in range(self.total_feature):
             if self.covered_dict[index] is True:
-                covered_number_neurons += 1
+                covered_number += 1
 
-        return covered_number_neurons, covered_number_neurons / float(self.total_feature)
+        return covered_number, covered_number / float(self.total_feature)
 
     def update_features(self, data):
         self.hidden = self.state_manager.get_hidden_state(data)
         activation = self.get_activation()
-        self.activates.append(activation)
-        features = (np.argwhere(activation > self.threshold)).tolist()
-        for feature in features:
-            self.covered_dict[feature[0]] = True
-            self.frequency_dict[feature[0]] += 1
+        dat_znorm = znorm(activation[self.indices])
+        sym_rep = ts_to_string(dat_znorm, cuts_for_asize(self.symbols))
+        feature = tuple(sym_rep)
+
+        if feature in self.feature:
+            index = self.feature.index(feature)
+            self.covered_dict[index] = True
+            self.frequency_dict[index] += 1
 
     def update_graph(self, num_samples):
         _, coverage = self.calculate_coverage()
         self.plt_x.append(num_samples)
         self.plt_y.append(coverage)
-        # print("%s layer cell coverage : %.8f" % (self.layer.name, coverage))
+        # print("%s layer negative sequence coverage : %.8f" % (self.layer.name, coverage_n))
 
     @staticmethod
     def calculate_variation(data):
@@ -102,8 +110,8 @@ class CellCoverage(RLCoverage):
         plt.plot(self.plt_x, self.plt_y)
         plt.xlabel('# of generated samples')
         plt.ylabel('coverage')
-        plt.title('Cell Coverage of ' + self.layer.name)
-        plt.savefig('output/' + self.model_name + '/' + self.layer.name + '_cc.png')
+        plt.title('Negative Sequence Coverage of ' + self.layer.name)
+        plt.savefig('output/' + self.model_name + '/' + self.layer.name + '_snc.png')
         plt.clf()
 
     def display_frequency_graph(self):
@@ -116,15 +124,15 @@ class CellCoverage(RLCoverage):
         plt.ylabel('number of activation')
         plt.title(self.layer.name + ' Frequency')
         plt.xlim(-1, n_groups)
-        plt.savefig('output/' + self.model_name + '/' + self.layer.name + '_cc_Frequency.png')
+        plt.savefig('output/' + self.model_name + '/' + self.layer.name + '_snc_Frequency.png')
         plt.clf()
 
     def display_stat(self):
         mean, variation = self.calculate_variation(self.fr_plt_y)
 
         f = open('output/%s_%s_tc.txt' % (self.model_name, self.layer.name), 'w')
-        f.write('mean: %f' % mean)
-        f.write('variation: %f' % variation)
+        f.write('mean_n: %f' % mean)
+        f.write('variation_n: %f' % variation)
         f.close()
 
     def get_name(self):

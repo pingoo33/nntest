@@ -14,6 +14,7 @@ class TopKCoverage(FCLCoverage):
         else:
             self.size = size
 
+        self.name = "TopKCoverage"
         self.layer = layer
         self.model_manager = model_manager
 
@@ -61,7 +62,7 @@ class TopKCoverage(FCLCoverage):
         _, coverage = self.calculate_coverage()
         self.plt_x.append(num_samples)
         self.plt_y.append(coverage)
-        print("%s layer Top-k coverage : %.8f" % (self.layer.name, coverage))
+        # print("%s layer Top-k coverage : %.8f" % (self.layer.name, coverage))
 
     @staticmethod
     def calculate_variation(data):
@@ -112,3 +113,6 @@ class TopKCoverage(FCLCoverage):
         f.write('mean: %f' % mean)
         f.write('variation: %f' % variation)
         f.close()
+
+    def get_name(self):
+        return self.name

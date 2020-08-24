@@ -16,6 +16,7 @@ class TopKPatternCoverage(FCLCoverage):
         else:
             self.size = size
 
+        self.name = "TopKPatternCoverage"
         self.plt_x = []
         self.plt_y = []
 
@@ -65,7 +66,7 @@ class TopKPatternCoverage(FCLCoverage):
         _, coverage = self.calculate_coverage()
         self.plt_x.append(num_samples)
         self.plt_y.append(coverage)
-        print("Top-k pattern coverage : %.8f" % coverage)
+        # print("Top-k pattern coverage : %.8f" % coverage)
 
     @staticmethod
     def calculate_variation(data):
@@ -79,7 +80,7 @@ class TopKPatternCoverage(FCLCoverage):
         plt.xlabel('# of generated samples')
         plt.ylabel('coverage')
         plt.title('Top-k Pattern Coverage of ' + self.model_manager.model_name)
-        plt.savefig('output/' + self.model_manager.model_name + '_tkc.png')
+        plt.savefig('output/' + self.model_manager.model_name + '_tkpc.png')
         plt.clf()
 
     def display_frequency_graph(self):
@@ -87,3 +88,6 @@ class TopKPatternCoverage(FCLCoverage):
 
     def display_stat(self):
         pass
+
+    def get_name(self):
+        return self.name

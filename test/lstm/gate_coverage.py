@@ -5,10 +5,17 @@ import matplotlib
 matplotlib.use('agg')
 from matplotlib import pyplot as plt
 from collections import defaultdict
+import pandas as pd
 
 
 class GateCoverage(RLCoverage):
+
+    def save_feature(self):
+        activations = pd.DataFrame(self.activates)
+        activations.to_csv('gc_activates.csv', mode='w')
+
     def __init__(self, layer, model_name, state_manager: StateManager, threshold, data):
+        self.name = "GateCoverage"
         self.plt_x = []
         self.plt_y = []
         self.fr_plt_x = []
@@ -26,6 +33,7 @@ class GateCoverage(RLCoverage):
         self.frequency_dict = defaultdict(int)
         self.__init_covered_dict()
         self.__init_frequency_dict()
+        self.activates = []
 
     def __init_covered_dict(self):
         for index in range(self.total_feature):
@@ -52,6 +60,7 @@ class GateCoverage(RLCoverage):
     def update_features(self, data):
         self.gate = self.state_manager.get_forget_state(data)
         activation = self.get_activation()
+        self.activates.append(activation)
         features = (np.argwhere(activation > self.threshold)).tolist()
         for feature in features:
             self.covered_dict[feature[0]] = True
@@ -61,7 +70,7 @@ class GateCoverage(RLCoverage):
         _, coverage = self.calculate_coverage()
         self.plt_x.append(num_samples)
         self.plt_y.append(coverage)
-        print("%s layer gate coverage : %.8f" % (self.layer.name, coverage))
+        # print("%s layer gate coverage : %.8f" % (self.layer.name, coverage))
 
     @staticmethod
     def calculate_variation(data):
@@ -112,3 +121,6 @@ class GateCoverage(RLCoverage):
         f.write('mean: %f' % mean)
         f.write('variation: %f' % variation)
         f.close()
+
+    def get_name(self):
+        return self.name

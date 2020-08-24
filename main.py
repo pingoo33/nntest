@@ -10,6 +10,7 @@ from data.cifar10.mutant_callback import Cifar10MutantCallback
 from data.mnist.data import MnistData
 from data.mnist.data_cnn import MnistCNNData
 from data.mnist.mutant_callback import MnistMutantCallback
+from data.oracle_einsum import OracleEinsum
 from model.atomic import Atomic
 from model.cifar10 import Cifar10
 from model.mnist import Mnist
@@ -53,10 +54,28 @@ def main():
     fold_size = int(args.fold_size)
     mode = args.mode
 
+    radius = 0.005
+
+    """
+        Temperature:
+        threshold_cc    = 2.5
+        threshold_gc    = 0.708
+        symbols_sq      = 2
+        seq             = [7,11]
+        
+        Atomic:
+        threshold_cc    = 5.11407
+        threshold_gc    = 0.90093
+        symbols_sq      = 2
+        seq             = [5,9]
+    """
     if 'temperature' in model_name:
+        radius = 0.6
+
         data_distribution = TemperatureDistribution()
         mutant_callback = NormalMutantCallback(data_distribution)
-        data_manager = TemperatureData(mutant_callback)
+        oracle = OracleEinsum(radius)
+        data_manager = TemperatureData(mutant_callback, oracle)
         model_manager = Temperature(model_name)
 
         test = TestNN(data_manager, model_manager)
@@ -71,7 +90,8 @@ def main():
     elif 'mnist_cnn' in model_name:
         model_manager = MnistCNN(model_name)
         mutant_callback = MnistMutantCallback(model_manager)
-        data_manager = MnistCNNData(mutant_callback)
+        oracle = OracleEinsum(radius)
+        data_manager = MnistCNNData(mutant_callback, oracle)
 
         test = TestNN(data_manager, model_manager)
 
@@ -85,7 +105,8 @@ def main():
     elif 'mnist' in model_name:
         model_manager = Mnist(model_name)
         mutant_callback = MnistMutantCallback(model_manager)
-        data_manager = MnistData(mutant_callback)
+        oracle = OracleEinsum(radius)
+        data_manager = MnistData(mutant_callback, oracle)
 
         test = TestNN(data_manager, model_manager)
 
@@ -97,10 +118,13 @@ def main():
         else:
             test.test(seed, threshold_tc, sec_kmnc, threshold_cc, threshold_gc, symbols_sq, seq, size_tkc, size_tkpc)
     elif 'atomic' in model_name:
+        radius = 6.66128
+
         model_manager = Atomic(model_name)
         data_distribution = AtomicDistribution()
         mutant_callback = AtomicMutantCallback(data_distribution)
-        data_manager = AtomicData(mutant_callback)
+        oracle = OracleEinsum(radius)
+        data_manager = AtomicData(mutant_callback, oracle)
 
         test = TestNN(data_manager, model_manager)
 
@@ -114,7 +138,8 @@ def main():
     elif 'cifar10' in model_name:
         model_manager = Cifar10(model_name)
         mutant_callback = Cifar10MutantCallback(model_manager)
-        data_manager = Cifar10Data(mutant_callback)
+        oracle = OracleEinsum(radius)
+        data_manager = Cifar10Data(mutant_callback, oracle)
 
         test = TestNN(data_manager, model_manager)
 
@@ -128,7 +153,8 @@ def main():
     elif 'resnet' in model_name:
         model_manager = Resnet(model_name)
         mutant_callback = Cifar10MutantCallback(model_manager)
-        data_manager = Cifar10Data(mutant_callback)
+        oracle = OracleEinsum(radius)
+        data_manager = Cifar10Data(mutant_callback, oracle)
 
         test = TestNN(data_manager, model_manager)
 

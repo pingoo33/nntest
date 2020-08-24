@@ -1,9 +1,9 @@
-import keras.backend as K
 import numpy as np
 from tensorflow import keras
-from keras import Model
-from keras.models import load_model
-from keras.optimizers import Adadelta
+import tensorflow.keras.backend as K
+from tensorflow.keras import Model
+from tensorflow.keras.models import load_model
+from tensorflow.keras.optimizers import Adadelta
 from sklearn.model_selection import KFold
 from tensorflow.keras.layers import Dense, LSTM
 

@@ -1,5 +1,5 @@
 import numpy as np
-import keras.backend as K
+import tensorflow.keras.backend as K
 
 
 class StateManager:
@@ -7,12 +7,15 @@ class StateManager:
         self.model = model
         self.layer_index = layer_index
 
-    def __evaluate(self, nodes_to_evaluate, x):
-        symb_inputs = (self.model._feed_inputs + self.model._feed_targets
-                       + self.model._feed_sample_weights)
+    def __evaluate(self, nodes_to_evaluate, x, y=None):
+        symb_inputs = (self.model._feed_inputs + self.model._feed_targets + self.model._feed_sample_weights)
         f = K.function(symb_inputs, nodes_to_evaluate)
-        x_, _, _ = self.model._standardize_user_data(x, None)
-        return f(x_)
+        x_, y_, sample_weight_ = self.model._standardize_user_data(x, y)
+        if y_ is None:
+            y_ = []
+        if sample_weight_ is None:
+            sample_weight_ = []
+        return f(x_ + y_ + sample_weight_)
 
     def __get_activations_single_layer(self, x, layer_name=None):
         nodes = [layer.output for layer in self.model.layers if
@@ -93,9 +96,9 @@ class StateManager:
         return h_t, c_t, f_t
 
     def get_hidden_state(self, data):
-        hidden, _, _ = self.cal_hidden_state(data, self.layer_index)
+        hidden, _, _ = self.cal_hidden_state(data, self.layer_index, np.shape(data)[0])
         return hidden
 
     def get_forget_state(self, data):
-        _, _, gate = self.cal_hidden_state(data, self.layer_index)
+        _, _, gate = self.cal_hidden_state(data, self.layer_index, np.shape(data)[0])
         return gate

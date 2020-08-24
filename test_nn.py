@@ -1,4 +1,6 @@
 import random
+from tqdm import tqdm
+import numpy as np
 
 from data.interface.data_manager import DataManager
 from model.interface.model_manager import ModelManager
@@ -8,10 +10,11 @@ from test.fc.boundary_coverage import BoundaryCoverage
 from test.lstm.cell_coverage import CellCoverage
 from test.lstm.gate_coverage import GateCoverage
 from test.fc.k_multisection_coverage import KMultisectionCoverage
-from test.lstm.sequence_coverage import SequenceCoverage
 from test.fc.threshold_coverage import ThresholdCoverage
 from test.fc.top_k_coverage import TopKCoverage
 from test.fc_pattern.top_k_pattern_coverage import TopKPatternCoverage
+from test.lstm.negative_sequence_coverage import NegativeSequenceCoverage
+from test.lstm.positive_sequence_coverage import PositiveSequenceCoverage
 
 
 class TestNN:
@@ -30,24 +33,30 @@ class TestNN:
         self.model_manager.train_model(x_train, y_train, x_test, y_test)
 
     def __mutant_data_process(self, coverage_set, target_data):
-        for data in target_data:
-            # TODO: implement oracle
-            before_output = self.model_manager.get_prob(data)
-            generated_data, _ = self.data_manager.mutant_data(data)
+        pbar = tqdm(range(len(target_data)), total=len(target_data))
+        for i in pbar:
+            before_output = self.model_manager.get_prob(target_data[i])
+            generated_data, _ = self.data_manager.mutant_data(target_data[i])
+
+            after_output = self.model_manager.get_prob(generated_data)
+            self.data_manager.update_sample(before_output, after_output, target_data[i], generated_data)
 
             for coverage in coverage_set:
-                if not (data is None):
-                    after_output = self.model_manager.get_prob(generated_data)
-                    self.data_manager.update_sample(before_output, after_output, data, generated_data)
-
-                    coverage.update_features(data)
+                if not (generated_data is None):
+                    coverage.update_features(generated_data)
                     coverage.update_graph(self.data_manager.get_num_samples() / len(coverage_set))
 
+            pbar.set_description("samples: %d, advs: %d"
+                                 % (self.data_manager.get_num_samples(), self.data_manager.get_num_advs()))
         for coverage in coverage_set:
             coverage.update_frequency_graph()
             coverage.display_graph()
             coverage.display_frequency_graph()
             coverage.display_stat()
+
+        for coverage in coverage_set:
+            _, result = coverage.calculate_coverage()
+            print("%s : %.5f" % (coverage.get_name(), result))
 
     def __lstm_test(self, target_data, threshold_cc, threshold_gc, symbols_sq, seq):
         model = self.model_manager.model
@@ -56,11 +65,12 @@ class TestNN:
         indices, lstm_layers = self.model_manager.get_lstm_layer()
 
         init_data = target_data[15]
-        layer = lstm_layers[-1]
+        layer = lstm_layers[0]
         state_manager = StateManager(model, indices[-1])
         coverage_set = [CellCoverage(layer, model_name, state_manager, threshold_cc, init_data),
                         GateCoverage(layer, model_name, state_manager, threshold_gc, init_data),
-                        SequenceCoverage(layer, model_name, state_manager, symbols_sq, seq)]
+                        PositiveSequenceCoverage(layer, model_name, state_manager, symbols_sq, seq),
+                        NegativeSequenceCoverage(layer, model_name, state_manager, symbols_sq, seq)]
 
         self.__mutant_data_process(coverage_set, target_data)
 
@@ -84,7 +94,7 @@ class TestNN:
     def test(self, seed, threshold_tc, sec_kmnc, threshold_cc, threshold_gc, symbols_sq, seq, size_tkc, size_tkpc):
         self.model_manager.load_model()
 
-        target_data = self.data_manager.x_train[random.sample(range(6000), seed)]
+        target_data = self.data_manager.x_train[random.sample(range(np.shape(self.data_manager.x_train)[0]), seed)]
 
         _, other_layers = self.model_manager.get_fc_layer()
 

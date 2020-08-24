@@ -1,3 +1,4 @@
+from tqdm import tqdm
 from collections import defaultdict
 import numpy as np
 
@@ -18,13 +19,15 @@ class ThresholdManager:
             self.max_threshold_dict[index] = 0
             self.min_threshold_dict[index] = 0
 
-        for data in data_set:
-            output = self.model_manager.get_intermediate_output(self.layer, data)
+        pbar = tqdm(range(len(data_set)), total=len(data_set))
+        for i in pbar:
+            output = self.model_manager.get_intermediate_output(self.layer, data_set[i])
             for num_neuron in range(output.shape[-1]):
                 if np.mean(output[..., num_neuron]) > self.max_threshold_dict[num_neuron]:
                     self.max_threshold_dict[num_neuron] = float(np.mean(output[..., num_neuron]))
                 elif np.mean(output[..., num_neuron]) < self.min_threshold_dict[num_neuron]:
                     self.min_threshold_dict[num_neuron] = float(np.mean(output[..., num_neuron]))
+        pbar.clear()
 
     def get_max_threshold(self, index):
         return self.max_threshold_dict[index]

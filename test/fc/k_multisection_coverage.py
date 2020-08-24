@@ -12,7 +12,7 @@ from matplotlib import pyplot as plt
 
 class KMultisectionCoverage(FCLCoverage):
     def __init__(self, layer, model_manager: ModelManager, threshold_manager: ThresholdManager, size):
-
+        self.name = "KMultisectionCoverage"
         self.num_section = size
         self.plt_x = []
         self.plt_y = []
@@ -87,7 +87,7 @@ class KMultisectionCoverage(FCLCoverage):
         _, coverage = self.calculate_coverage()
         self.plt_x.append(num_samples)
         self.plt_y.append(coverage)
-        print("%s layer k-multisection coverage : %.8f" % (self.layer.name, coverage))
+        # print("%s layer k-multisection coverage : %.8f" % (self.layer.name, coverage))
 
     def update_frequency_graph(self):
         for num_neuron in range(self.layer.output_shape[-1]):
@@ -134,3 +134,6 @@ class KMultisectionCoverage(FCLCoverage):
         f.write('mean: %f' % mean)
         f.write('variation: %f' % variation)
         f.close()
+
+    def get_name(self):
+        return self.name

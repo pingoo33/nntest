@@ -10,6 +10,7 @@ from matplotlib import pyplot as plt
 
 class ThresholdCoverage(FCLCoverage):
     def __init__(self, layer, model_manager: ModelManager, threshold=0):
+        self.name = "ThresholdCoverage"
         self.plt_x = []
         self.plt_y = []
         self.fr_plt_x = []
@@ -52,7 +53,7 @@ class ThresholdCoverage(FCLCoverage):
         _, coverage = self.calculate_coverage()
         self.plt_x.append(num_samples)
         self.plt_y.append(coverage)
-        print("%s layer threshold coverage : %.8f" % (self.layer.name, coverage))
+        # print("%s layer threshold coverage : %.8f" % (self.layer.name, coverage))
 
     def update_frequency_graph(self):
         for num_neuron in range(self.layer.output_shape[-1]):
@@ -103,3 +104,6 @@ class ThresholdCoverage(FCLCoverage):
         f.write('mean: %f' % mean)
         f.write('variation: %f' % variation)
         f.close()
+
+    def get_name(self):
+        return self.name
