@@ -69,6 +69,7 @@ class PositiveSequenceCoverage(RLCoverage):
 
     def update_features(self, data):
         self.hidden = self.state_manager.get_hidden_state(data)
+        activation = self.get_activation()
         dat_znorm = znorm(activation[self.indices])
         sym_rep = ts_to_string(dat_znorm, cuts_for_asize(self.symbols))
         feature = tuple(sym_rep)

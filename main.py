@@ -36,7 +36,7 @@ def main():
     parser.add_argument('--size_tkc', dest='size_tkc', default='1', help='')
     parser.add_argument('--size_tkpc', dest='size_tkpc', default='1', help='')
     parser.add_argument('--fold_size', dest='fold_size', default='1', help='')
-    parser.add_argument('--mode', dest='mode', default='test', help='')
+    parser.add_argument('--mode', dest='mode', default='test_lstm', help='')
 
     args = parser.parse_args()
 
@@ -55,6 +55,7 @@ def main():
     mode = args.mode
 
     radius = 0.005
+    test = None
 
     """
         Temperature:
@@ -78,45 +79,21 @@ def main():
         data_manager = TemperatureData(mutant_callback, oracle)
         model_manager = Temperature(model_name)
 
-        test = TestNN(data_manager, model_manager)
-
-        if mode == 'train':
-            if 'kfold' in model_name:
-                test.kfold_train(fold_size)
-            else:
-                test.train()
-        else:
-            test.test(seed, threshold_tc, sec_kmnc, threshold_cc, threshold_gc, symbols_sq, seq, size_tkc, size_tkpc)
+        test = TestNN(data_manager, model_manager, seed)
     elif 'mnist_cnn' in model_name:
         model_manager = MnistCNN(model_name)
         mutant_callback = MnistMutantCallback(model_manager)
         oracle = OracleEinsum(radius)
         data_manager = MnistCNNData(mutant_callback, oracle)
 
-        test = TestNN(data_manager, model_manager)
-
-        if mode == 'train':
-            if 'kfold' in model_name:
-                test.kfold_train(fold_size)
-            else:
-                test.train()
-        else:
-            test.test(seed, threshold_tc, sec_kmnc, threshold_cc, threshold_gc, symbols_sq, seq, size_tkc, size_tkpc)
+        test = TestNN(data_manager, model_manager, seed)
     elif 'mnist' in model_name:
         model_manager = Mnist(model_name)
         mutant_callback = MnistMutantCallback(model_manager)
         oracle = OracleEinsum(radius)
         data_manager = MnistData(mutant_callback, oracle)
 
-        test = TestNN(data_manager, model_manager)
-
-        if mode == 'train':
-            if 'kfold' in model_name:
-                test.kfold_train(fold_size)
-            else:
-                test.train()
-        else:
-            test.test(seed, threshold_tc, sec_kmnc, threshold_cc, threshold_gc, symbols_sq, seq, size_tkc, size_tkpc)
+        test = TestNN(data_manager, model_manager, seed)
     elif 'atomic' in model_name:
         radius = 6.66128
 
@@ -126,45 +103,33 @@ def main():
         oracle = OracleEinsum(radius)
         data_manager = AtomicData(mutant_callback, oracle)
 
-        test = TestNN(data_manager, model_manager)
-
-        if mode == 'train':
-            if 'kfold' in model_name:
-                test.kfold_train(fold_size)
-            else:
-                test.train()
-        else:
-            test.test(seed, threshold_tc, sec_kmnc, threshold_cc, threshold_gc, symbols_sq, seq, size_tkc, size_tkpc)
+        test = TestNN(data_manager, model_manager, seed)
     elif 'cifar10' in model_name:
         model_manager = Cifar10(model_name)
         mutant_callback = Cifar10MutantCallback(model_manager)
         oracle = OracleEinsum(radius)
         data_manager = Cifar10Data(mutant_callback, oracle)
 
-        test = TestNN(data_manager, model_manager)
-
-        if mode == 'train':
-            if 'kfold' in model_name:
-                test.kfold_train(fold_size)
-            else:
-                test.train()
-        else:
-            test.test(seed, threshold_tc, sec_kmnc, threshold_cc, threshold_gc, symbols_sq, seq, size_tkc, size_tkpc)
+        test = TestNN(data_manager, model_manager, seed)
     elif 'resnet' in model_name:
         model_manager = Resnet(model_name)
         mutant_callback = Cifar10MutantCallback(model_manager)
         oracle = OracleEinsum(radius)
         data_manager = Cifar10Data(mutant_callback, oracle)
 
-        test = TestNN(data_manager, model_manager)
+        test = TestNN(data_manager, model_manager, seed)
 
-        if mode == 'train':
-            if 'kfold' in model_name:
-                test.kfold_train(fold_size)
-            else:
-                test.train()
+    if mode == 'train':
+        if 'kfold' in model_name:
+            test.kfold_train(fold_size)
         else:
-            test.test(seed, threshold_tc, sec_kmnc, threshold_cc, threshold_gc, symbols_sq, seq, size_tkc, size_tkpc)
+            test.train()
+    elif mode == 'test_lstm':
+        test.lstm_test(threshold_cc, threshold_gc, symbols_sq, seq)
+    elif mode == 'test_fc':
+        test.fc_test(threshold_tc, sec_kmnc, size_tkc)
+    elif mode == 'test_pattern':
+        test.pattern_test(size_tkpc)
 
 
 if __name__ == "__main__":
