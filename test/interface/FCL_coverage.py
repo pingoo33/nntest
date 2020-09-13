@@ -1,6 +1,6 @@
 import abc
-from keras import backend as K
-from .coverage import Coverage
+
+from tensorflow.keras import backend as K
 
 
 class FCLCoverage(metaclass=abc.ABCMeta):

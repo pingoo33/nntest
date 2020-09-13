@@ -1,9 +1,10 @@
-from keras.layers import Dense, Input, LSTM
-from keras.models import load_model, Sequential
-from keras.optimizers import Adam
-from keras import Model
 import numpy as np
 from sklearn.model_selection import KFold
+
+from tensorflow.keras.layers import Dense, Input, LSTM
+from tensorflow.keras.models import load_model
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras import Model
 
 from model.interface.model_manager import ModelManager
 

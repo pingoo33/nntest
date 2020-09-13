@@ -1,13 +1,13 @@
-from collections import defaultdict
-
-from model.state_manager import StateManager
-from test.interface.RL_coverage import RLCoverage
 import numpy as np
+import pandas as pd
 import matplotlib
 
 matplotlib.use('agg')
 from matplotlib import pyplot as plt
-import pandas as pd
+from collections import defaultdict
+
+from model.state_manager import StateManager
+from test.interface.RL_coverage import RLCoverage
 
 
 class CellCoverage(RLCoverage):

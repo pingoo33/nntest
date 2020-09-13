@@ -1,9 +1,10 @@
-from keras.layers import Dense, Input, Activation, Flatten, Conv2D, MaxPooling2D
-from keras.models import load_model, Sequential
-from keras.optimizers import RMSprop
-from keras import Model
 import numpy as np
 from sklearn.model_selection import KFold
+
+from tensorflow.keras.layers import Dense, Input, Activation, Flatten, Conv2D, MaxPooling2D
+from tensorflow.keras.models import load_model
+from tensorflow.keras.optimizers import RMSprop
+from tensorflow.keras import Model
 
 from model.interface.model_manager import ModelManager
 

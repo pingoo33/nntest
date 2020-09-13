@@ -1,6 +1,6 @@
+import numpy as np
 from tqdm import tqdm
 from collections import defaultdict
-import numpy as np
 
 from model.interface.model_manager import ModelManager
 

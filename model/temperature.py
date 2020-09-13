@@ -1,10 +1,11 @@
 import numpy as np
+from sklearn.model_selection import KFold
+
 from tensorflow import keras
 import tensorflow.keras.backend as K
 from tensorflow.keras import Model
 from tensorflow.keras.models import load_model
 from tensorflow.keras.optimizers import Adadelta
-from sklearn.model_selection import KFold
 from tensorflow.keras.layers import Dense, LSTM
 
 from model.interface.model_manager import ModelManager

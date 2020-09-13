@@ -1,15 +1,16 @@
-from collections import defaultdict
-from model.state_manager import StateManager
-from test.interface.RL_coverage import RLCoverage
+import itertools
 import numpy as np
+from saxpy.alphabet import cuts_for_asize
+from saxpy.sax import ts_to_string
+from saxpy.znorm import znorm
 import matplotlib
 
 matplotlib.use('agg')
 from matplotlib import pyplot as plt
-from saxpy.alphabet import cuts_for_asize
-from saxpy.sax import ts_to_string
-from saxpy.znorm import znorm
-import itertools
+from collections import defaultdict
+
+from model.state_manager import StateManager
+from test.interface.RL_coverage import RLCoverage
 
 
 class NegativeSequenceCoverage(RLCoverage):

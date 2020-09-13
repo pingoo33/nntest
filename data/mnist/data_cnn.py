@@ -1,5 +1,5 @@
-from keras.datasets import mnist
-from keras.utils import to_categorical
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.utils import to_categorical
 
 from data.interface.data_manager import DataManager
 from data.interface.mutant_callback import MutantCallback
@@ -48,11 +48,3 @@ class MnistCNNData(DataManager):
             self.advs.append(dest)
 
         self.num_samples += 1
-        self.display_success_rate()
-
-    def display_samples(self):
-        print("%s samples are considered" % self.num_samples)
-
-    def display_success_rate(self):
-        print("%s samples, within which there are %s adversarial examples" % (self.num_samples, self.num_adv))
-        print("the rate of adversarial examples is %.2f\n" % (self.num_adv / self.num_samples))

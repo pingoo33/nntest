@@ -1,7 +1,8 @@
+import random
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import RobustScaler
-import random
+
 from data.interface.data_manager import DataManager
 from data.interface.mutant_callback import MutantCallback
 from data.interface.oracle import Oracle

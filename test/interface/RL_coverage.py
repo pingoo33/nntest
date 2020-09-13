@@ -1,5 +1,4 @@
 import abc
-from .coverage import Coverage
 
 
 class RLCoverage(metaclass=abc.ABCMeta):

@@ -1,11 +1,12 @@
-from model.interface.model_manager import ModelManager
 import numpy as np
-import keras
-from keras.layers import Dense, Conv2D, BatchNormalization, Activation
-from keras.layers import AveragePooling2D, Input, Flatten
-from keras.regularizers import l2
-from keras.optimizers import Adam
-from keras import Model
+
+from tensorflow.keras.layers import Dense, Conv2D, BatchNormalization, Activation
+from tensorflow.keras.layers import AveragePooling2D, Input, Flatten
+from tensorflow.keras.regularizers import l2
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras import Model
+
+from model.interface.model_manager import ModelManager
 
 
 class Resnet(ModelManager):

@@ -95,7 +95,7 @@ def main():
 
         test = TestNN(data_manager, model_manager, seed)
     elif 'atomic' in model_name:
-        radius = 6.66128
+        radius = 6.21068
 
         model_manager = Atomic(model_name)
         data_distribution = AtomicDistribution()

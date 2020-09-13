@@ -1,10 +1,12 @@
-from model.interface.model_manager import ModelManager
-from test.interface.FCL_coverage import FCLCoverage
-from collections import defaultdict
 import numpy as np
 import matplotlib
+
 matplotlib.use('agg')
 from matplotlib import pyplot as plt
+from collections import defaultdict
+
+from model.interface.model_manager import ModelManager
+from test.interface.FCL_coverage import FCLCoverage
 
 
 class TopKCoverage(FCLCoverage):

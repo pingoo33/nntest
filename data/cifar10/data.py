@@ -1,5 +1,5 @@
-from keras.datasets import cifar10
-from keras.utils import to_categorical
+from tensorflow.keras.datasets import cifar10
+from tensorflow.keras.utils import to_categorical
 
 from data.interface.data_manager import DataManager
 from data.interface.mutant_callback import MutantCallback
