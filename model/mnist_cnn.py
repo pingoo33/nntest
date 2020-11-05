@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.model_selection import KFold
 
 from tensorflow.keras.layers import Dense, Input, Conv2D, MaxPooling2D, Flatten
-from tensorflow.keras.models import load_model
+from tensorflow.keras.models import load_model, Sequential
 from tensorflow.keras.optimizers import Adadelta
 from tensorflow.keras import Model
 
@@ -19,7 +19,7 @@ class MnistCNN(ModelManager):
     def train_model(self, x_train, y_train, x_test, y_test):
         n_output1 = 128
         n_output2 = 10
-        epochs = 12
+        epochs = 100
 
         input_layer = Input(shape=x_train.shape[1:])
 
@@ -76,7 +76,7 @@ class MnistCNN(ModelManager):
         print("accuracy : %s" % str(acc))
         self.model.save('models/%s.h5' % self.model_name)
 
-    def test_model(self):
+    def test_model(self, test_x, test_y):
         pass
 
     def get_intermediate_output(self, layer, data):
@@ -124,7 +124,7 @@ class MnistCNN(ModelManager):
                     or 'flatten' in layer.name:
                 continue
             layer_type = self.__get_layer_type(layer.name)
-            if layer_type != "lstm":
+            if layer_type == "dense":
                 layers.append(layer)
                 indices.append(index)
         return indices, layers

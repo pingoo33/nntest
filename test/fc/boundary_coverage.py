@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import matplotlib
 
 matplotlib.use('agg')
@@ -11,6 +12,9 @@ from test.interface.FCL_coverage import FCLCoverage
 
 
 class BoundaryCoverage(FCLCoverage):
+    def save_feature(self):
+        pass
+
     def __init__(self, layer, model_manager: ModelManager, threshold_manager: ThresholdManager):
         self.name = "BoundaryCoverage"
         self.plt_x = []
@@ -93,33 +97,38 @@ class BoundaryCoverage(FCLCoverage):
             self.max_fr_plt_y.append(self.max_frequency_dict[num_neuron])
             self.min_fr_plt_y.append(self.min_frequency_dict[num_neuron])
 
-    def display_graph(self):
+    def display_graph(self, name=''):
+        name = name + self.name
         plt.plot(self.plt_x, self.plt_y)
         plt.xlabel('# of generated samples')
         plt.ylabel('coverage')
         plt.title('Boundary Coverage of ' + self.layer.name)
-        plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_bc.png')
+        plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_' + name + '.png')
         plt.clf()
 
-    def display_frequency_graph(self):
-        n_groups = len(self.fr_plt_x)
-        index = np.arange(n_groups)
+    def display_frequency_graph(self, name=''):
+        name = name + self.name
+        data = {
+            'max': self.max_fr_plt_y,
+            'min': self.min_fr_plt_y
+        }
+        df = pd.DataFrame(data)
 
-        plt.bar(index, self.max_fr_plt_y, align='center')
-        plt.bar(index, self.min_fr_plt_y, align='center', color='#5233aa', bottom=self.max_fr_plt_y)
-
-        plt.xlabel('features')
-        plt.ylabel('number of activation')
-        plt.title(self.layer.name + ' Frequency')
-        plt.xlim(-1, n_groups)
-        plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_bc_Frequency.png')
+        title = self.layer.name + ' Frequency of Boundary Coverage'
+        ax = df.plot(kind='bar', stacked=True, figsize=(10, 6), title=title,
+                     xticks=([w for w in range(len(self.fr_plt_x)) if w % 10 == 0]))
+        ax.set_xlabel('neuron')
+        ax.set_ylabel('number of activation')
+        plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_' + name + '_Frequency.png')
         plt.clf()
 
-    def display_stat(self):
+    def display_stat(self, name=''):
+        _, coverage = self.calculate_coverage()
         mean, variation = self.calculate_variation(np.concatenate((self.max_fr_plt_y, self.min_fr_plt_y), axis=0))
 
-        f = open('output/%s_%s_tc.txt' % (self.model_manager.model_name, self.layer.name), 'w')
-        f.write('mean: %f' % mean)
+        f = open('output/%s/%s_%s_bc.txt' % (self.model_manager.model_name, name, self.layer.name), 'w')
+        f.write('coverage: %f\n' % coverage)
+        f.write('mean: %f\n' % mean)
         f.write('variation: %f' % variation)
         f.close()
 

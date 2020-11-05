@@ -19,6 +19,8 @@ class MnistCNNData(DataManager):
         self.load_data()
 
     def load_data(self):
+        num_classes = 10
+
         (self.x_train, self.y_train), (self.x_test, self.y_test) = mnist.load_data()
 
         self.x_train = self.x_train.reshape(self.x_train.shape[0], 28, 28, 1)
@@ -26,8 +28,8 @@ class MnistCNNData(DataManager):
 
         self.x_train = self.x_train.astype('float32') / 255
         self.x_test = self.x_test.astype('float32') / 255
-        self.y_train = to_categorical(self.y_train)
-        self.y_test = to_categorical(self.y_test)
+        self.y_train = to_categorical(self.y_train, num_classes)
+        self.y_test = to_categorical(self.y_test, num_classes)
 
     def mutant_data(self, data):
         new_data = self.mutant_callback.mutant_data(data)
@@ -42,9 +44,20 @@ class MnistCNNData(DataManager):
     def get_num_samples(self):
         return self.num_samples
 
-    def update_sample(self, src_label, dest_label, src, dest):
-        if src_label != dest_label and self.oracle.pass_oracle(src, dest):
-            self.num_adv += 1
-            self.advs.append(dest)
+    def update_sample(self, src_label, dest_label, src=None, dest=None):
+        if src is not None and dest is not None:
+            if src_label != dest_label and self.oracle.pass_oracle(src, dest):
+                self.num_adv += 1
+                self.advs.append(dest)
+        else:
+            if src_label != dest_label:
+                self.num_adv += 1
+                self.advs.append(dest)
 
         self.num_samples += 1
+
+    def get_num_advs(self):
+        return self.num_adv
+
+    def save_advs(self):
+        pass

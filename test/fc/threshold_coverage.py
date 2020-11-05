@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import matplotlib
 
 matplotlib.use('agg')
@@ -10,6 +11,11 @@ from test.interface.FCL_coverage import FCLCoverage
 
 
 class ThresholdCoverage(FCLCoverage):
+    def save_feature(self):
+        activations = pd.DataFrame(self.activates)
+        activations.to_csv('output/' + self.model_manager.model_name + '/' + self.layer.name + '_cc_activates.csv',
+                           mode='w')
+
     def __init__(self, layer, model_manager: ModelManager, threshold=0):
         self.name = "ThresholdCoverage"
         self.plt_x = []
@@ -20,6 +26,8 @@ class ThresholdCoverage(FCLCoverage):
         self.layer = layer
         self.model_manager = model_manager
         self.threshold = threshold
+
+        self.activates = []
 
         self.covered_dict = defaultdict(bool)
         self.__init_covered_dict()
@@ -46,7 +54,9 @@ class ThresholdCoverage(FCLCoverage):
     def update_features(self, data):
         inter_output = self.model_manager.get_intermediate_output(self.layer, data)
         for num_neuron in range(inter_output.shape[-1]):
-            if np.mean(inter_output[..., num_neuron]) > self.threshold:
+            activate = np.mean(inter_output[..., num_neuron])
+            self.activates.append(activate)
+            if activate > self.threshold:
                 self.covered_dict[num_neuron] = True
                 self.frequency_dict[num_neuron] += 1
 
@@ -77,32 +87,35 @@ class ThresholdCoverage(FCLCoverage):
         variation = square_sum / len(data)
         return mean, variation
 
-    def display_graph(self):
+    def display_graph(self, name=''):
+        name = name + self.name
         plt.plot(self.plt_x, self.plt_y)
         plt.xlabel('# of generated samples')
         plt.ylabel('coverage')
         plt.title('Threshold Coverage of ' + self.layer.name)
-        plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_tc.png')
+        plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_' + name + '.png')
         plt.clf()
 
-    def display_frequency_graph(self):
-        n_groups = len(self.fr_plt_x)
-        index = np.arange(n_groups)
+    def display_frequency_graph(self, name=''):
+        name = name + self.name
+        self.fr_plt_y = np.array(self.fr_plt_y)
+        df = pd.DataFrame(self.fr_plt_y)
 
-        plt.bar(index, self.fr_plt_y, align='center')
-
-        plt.xlabel('features')
-        plt.ylabel('number of activation')
-        plt.title(self.layer.name + ' Frequency')
-        plt.xlim(-1, n_groups)
-        plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_tc_Frequency.png')
+        title = self.layer.name + ' Frequency of Threshold Coverage'
+        ax = df.plot(kind='bar', figsize=(10, 6), title=title,
+                     xticks=([w for w in range(len(self.fr_plt_x)) if w % 10 == 0]))
+        ax.set_xlabel('neuron')
+        ax.set_ylabel('number of activation')
+        plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_' + name + '_Frequency.png')
         plt.clf()
 
-    def display_stat(self):
+    def display_stat(self, name=''):
+        _, coverage = self.calculate_coverage()
         mean, variation = self.calculate_variation(self.fr_plt_y)
 
-        f = open('output/%s_%s_tc.txt' % (self.model_manager.model_name, self.layer.name), 'w')
-        f.write('mean: %f' % mean)
+        f = open('output/%s/%s_%s_tc.txt' % (self.model_manager.model_name, name, self.layer.name), 'w')
+        f.write('coverage: %f\n' % coverage)
+        f.write('mean: %f\n' % mean)
         f.write('variation: %f' % variation)
         f.close()
 

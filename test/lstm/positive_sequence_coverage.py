@@ -21,8 +21,6 @@ class PositiveSequenceCoverage(RLCoverage):
         self.name = "PositiveSequenceCoverage"
         self.plt_x = []
         self.plt_y = []
-        self.fr_plt_x = []
-        self.fr_plt_y = []
 
         self.layer = layer
         self.model_name = model_name
@@ -33,9 +31,7 @@ class PositiveSequenceCoverage(RLCoverage):
         self.__init_feature()
 
         self.covered_dict = defaultdict(bool)
-        self.frequency_dict = defaultdict(int)
         self.__init_covered_dict()
-        self.__init_frequency_dict()
 
     def __init_feature(self):
         t1 = int(self.seq[0])
@@ -49,10 +45,6 @@ class PositiveSequenceCoverage(RLCoverage):
     def __init_covered_dict(self):
         for index in range(self.total_feature):
             self.covered_dict[index] = False
-
-    def __init_frequency_dict(self):
-        for index in range(self.total_feature):
-            self.frequency_dict[index] = 0
 
     def get_activation(self):
         hidden = self.hidden
@@ -78,7 +70,6 @@ class PositiveSequenceCoverage(RLCoverage):
         if feature in self.feature:
             index = self.feature.index(feature)
             self.covered_dict[index] = True
-            self.frequency_dict[index] += 1
 
     def update_graph(self, num_samples):
         _, coverage = self.calculate_coverage()
@@ -103,9 +94,7 @@ class PositiveSequenceCoverage(RLCoverage):
         return mean, variation
 
     def update_frequency_graph(self):
-        for index in range(self.total_feature):
-            self.fr_plt_x.append(index)
-            self.fr_plt_y.append(self.frequency_dict[index])
+        pass
 
     def display_graph(self):
         plt.plot(self.plt_x, self.plt_y)
@@ -116,24 +105,13 @@ class PositiveSequenceCoverage(RLCoverage):
         plt.clf()
 
     def display_frequency_graph(self):
-        n_groups = len(self.fr_plt_x)
-        index = np.arange(n_groups)
-
-        plt.bar(index, self.fr_plt_y, align='center')
-
-        plt.xlabel('features')
-        plt.ylabel('activation counts')
-        plt.title(self.layer.name + ' Frequency')
-        plt.xlim(-1, n_groups)
-        plt.savefig('output/' + self.model_name + '/' + self.layer.name + '_spc_Frequency.png')
-        plt.clf()
+        pass
 
     def display_stat(self):
-        mean_p, variation_p = self.calculate_variation(self.fr_plt_y)
+        _, coverage = self.calculate_coverage()
 
-        f = open('output/%s_%s_tc.txt' % (self.model_name, self.layer.name), 'w')
-        f.write('mean_p: %f' % mean_p)
-        f.write('variation_p: %f' % variation_p)
+        f = open('output/%s_%s_spc.txt' % (self.model_name, self.layer.name), 'w')
+        f.write('coverage: %f\n' % coverage)
         f.close()
 
     def get_name(self):

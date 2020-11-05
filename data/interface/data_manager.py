@@ -7,6 +7,9 @@ class DataManager(metaclass=abc.ABCMeta):
         self.y_train = None
         self.x_test = None
         self.y_test = None
+        self.num_adv = 0
+        self.advs = []
+        self.num_samples = 0
 
     @abc.abstractmethod
     def load_data(self):
@@ -37,5 +40,10 @@ class DataManager(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def update_sample(self, src_label, dest_label, src, dest):
+    def update_sample(self, src_label, dest_label, src=None, dest=None):
         pass
+
+    def reset_sample(self):
+        self.num_samples = 0
+        self.num_adv = 0
+        self.advs = []

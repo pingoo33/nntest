@@ -132,3 +132,7 @@ dmypy.json
 /.idea
 /data/atomic
 /model/atomic.py
+/images
+/dataset
+/output
+/models

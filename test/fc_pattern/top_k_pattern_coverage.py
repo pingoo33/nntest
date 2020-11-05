@@ -10,6 +10,9 @@ from test.interface.FCL_coverage import FCLCoverage
 
 
 class TopKPatternCoverage(FCLCoverage):
+    def save_feature(self):
+        pass
+
     def __init__(self, model_manager: ModelManager, size):
         self.model_manager = model_manager
         _, self.layers = model_manager.get_fc_layer()

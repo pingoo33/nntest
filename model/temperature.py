@@ -1,4 +1,5 @@
 import numpy as np
+
 from sklearn.model_selection import KFold
 
 from tensorflow import keras
@@ -99,8 +100,8 @@ class Temperature(ModelManager):
         print("accuracy : %s" % str(acc))
         self.model.save('models/%s.h5' % self.model_name)
 
-    def test_model(self):
-        pass
+    def test_model(self, test_x, test_y):
+        return self.model.evaluate(test_x, test_y)[1]
 
     def get_layer(self, index):
         return self.model.layers[index]
@@ -134,7 +135,7 @@ class Temperature(ModelManager):
                     or 'flatten' in layer.name:
                 continue
             layer_type = self.__get_layer_type(layer.name)
-            if layer_type != "lstm":
+            if layer_type == "dense":
                 layers.append(layer)
                 indices.append(index)
         return indices, layers

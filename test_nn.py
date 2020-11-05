@@ -25,6 +25,8 @@ class TestNN:
 
         self.target_data = self.data_manager.x_train[random.sample(range(np.shape(self.data_manager.x_train)[0]), seed)]
 
+        self.target_data = self.data_manager.x_train[random.sample(range(np.shape(self.data_manager.x_train)[0]), seed)]
+
     def kfold_train(self, fold_size):
         (x_train, y_train) = self.data_manager.get_train_data()
         (x_test, y_test) = self.data_manager.get_test_data()
@@ -52,6 +54,7 @@ class TestNN:
             pbar.set_description("samples: %d, advs: %d"
                                  % (self.data_manager.get_num_samples(), self.data_manager.get_num_advs()))
         for coverage in coverage_set:
+            coverage.save_feature()
             coverage.update_frequency_graph()
             coverage.display_graph()
             coverage.display_frequency_graph()
@@ -62,34 +65,40 @@ class TestNN:
             print("%s : %.5f" % (coverage.get_name(), result))
 
     def lstm_test(self, threshold_cc, threshold_gc, symbols_sq, seq):
+        self.model_manager.load_model()
         model = self.model_manager.model
         model_name = self.model_manager.model_name
 
         indices, lstm_layers = self.model_manager.get_lstm_layer()
 
         init_data = self.target_data[15]
-        layer = lstm_layers[0]
+        layer = lstm_layers[-1]
         state_manager = StateManager(model, indices[-1])
         coverage_set = [CellCoverage(layer, model_name, state_manager, threshold_cc, init_data),
                         GateCoverage(layer, model_name, state_manager, threshold_gc, init_data),
                         PositiveSequenceCoverage(layer, model_name, state_manager, symbols_sq, seq),
                         NegativeSequenceCoverage(layer, model_name, state_manager, symbols_sq, seq)]
+        # coverage_set = [CellCoverage(layer, model_name, state_manager, threshold_cc, init_data),
+        #                 GateCoverage(layer, model_name, state_manager, threshold_gc, init_data)]
 
         self.__mutant_data_process(coverage_set, self.target_data)
 
     def fc_test(self, threshold_tc, sec_kmnc, size_tkc):
+        self.model_manager.load_model()
         _, other_layers = self.model_manager.get_fc_layer()
 
         for layer in other_layers:
             threshold_manager = ThresholdManager(self.model_manager, layer, self.data_manager.x_train)
-            coverage_set = [ThresholdCoverage(layer, self.model_manager, threshold_tc),
-                            KMultisectionCoverage(layer, self.model_manager, threshold_manager, sec_kmnc),
-                            BoundaryCoverage(layer, self.model_manager, threshold_manager),
-                            TopKCoverage(layer, self.model_manager, size_tkc)]
+            # coverage_set = [ThresholdCoverage(layer, self.model_manager, threshold_tc),
+            #                 KMultisectionCoverage(layer, self.model_manager, threshold_manager, sec_kmnc),
+            #                 BoundaryCoverage(layer, self.model_manager, threshold_manager),
+            #                 TopKCoverage(layer, self.model_manager, size_tkc)]
+            coverage_set = [ThresholdCoverage(layer, self.model_manager, threshold_tc)]
 
             self.__mutant_data_process(coverage_set, self.target_data)
 
     def pattern_test(self, size_tkpc):
+        self.model_manager.load_model()
         coverage_set = [TopKPatternCoverage(self.model_manager, size_tkpc)]
 
         self.__mutant_data_process(coverage_set, self.target_data)

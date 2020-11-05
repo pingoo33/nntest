@@ -129,7 +129,7 @@ class Resnet(ModelManager):
     def kfold_train_model(self, fold_size, x_train, y_train, x_test, y_test):
         pass
 
-    def test_model(self):
+    def test_model(self, test_x, test_y):
         pass
 
     def get_intermediate_output(self, layer, data):

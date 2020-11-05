@@ -16,6 +16,7 @@ from model.cifar10 import Cifar10
 from model.mnist import Mnist
 from model.mnist_cnn import MnistCNN
 from model.resnet import Resnet
+from test_gan import TestGAN
 from test_nn import *
 from model.temperature import Temperature
 from data.temperature.normal_mutant_callback import NormalMutantCallback
@@ -95,7 +96,7 @@ def main():
 
         test = TestNN(data_manager, model_manager, seed)
     elif 'atomic' in model_name:
-        radius = 6.21068
+        radius = 6.66128
 
         model_manager = Atomic(model_name)
         data_distribution = AtomicDistribution()
@@ -118,6 +119,13 @@ def main():
         data_manager = Cifar10Data(mutant_callback, oracle)
 
         test = TestNN(data_manager, model_manager, seed)
+    elif 'test_gan' in model_name:
+        model_manager = MnistCNN('mnist_cnn')
+        mutant_callback = MnistMutantCallback(model_manager)
+        oracle = OracleEinsum(radius)
+        data_manager = MnistCNNData(mutant_callback, oracle)
+
+        test = TestGAN(data_manager, model_manager)
 
     if mode == 'train':
         if 'kfold' in model_name:
