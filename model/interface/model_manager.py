@@ -1,5 +1,4 @@
 import abc
-
 import tensorflow.keras.backend as K
 
 
@@ -37,7 +36,7 @@ class ModelManager(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def test_model(self):
+    def test_model(self, test_x, test_y):
         pass
 
     @abc.abstractmethod

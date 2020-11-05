@@ -1,10 +1,9 @@
-import numpy as np
-from sklearn.model_selection import KFold
-
 from tensorflow.keras.layers import Dense, Input, LSTM
-from tensorflow.keras.models import load_model
+from tensorflow.keras.models import load_model, Sequential
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras import Model
+import numpy as np
+from sklearn.model_selection import KFold
 
 from model.interface.model_manager import ModelManager
 
@@ -76,7 +75,7 @@ class Mnist(ModelManager):
         print("accuracy : %s" % str(acc))
         self.model.save('models/%s.h5' % self.model_name)
 
-    def test_model(self):
+    def test_model(self, test_x, test_y):
         pass
 
     def get_intermediate_output(self, layer, data):

@@ -1,12 +1,10 @@
+from model.interface.model_manager import ModelManager
+from test.interface.FCL_coverage import FCLCoverage
 import math
 import numpy as np
 import matplotlib
-
 matplotlib.use('agg')
 from matplotlib import pyplot as plt
-
-from model.interface.model_manager import ModelManager
-from test.interface.FCL_coverage import FCLCoverage
 
 
 class TopKPatternCoverage(FCLCoverage):
@@ -33,7 +31,7 @@ class TopKPatternCoverage(FCLCoverage):
         num_patterns = 1
         for num_neurons in num_neurons_by_layer:
             num_patterns = num_patterns * (math.factorial(num_neurons) / (
-                    math.factorial(num_neurons - self.size) * math.factorial(self.size)))
+                        math.factorial(num_neurons - self.size) * math.factorial(self.size)))
 
         return num_patterns
 

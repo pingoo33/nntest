@@ -1,10 +1,8 @@
+from data.interface.mutant_callback import MutantCallback
 import random
 import numpy as np
-
-import tensorflow.keras.backend as K
-
 from model.interface.model_manager import ModelManager
-from data.interface.mutant_callback import MutantCallback
+import tensorflow.keras.backend as K
 
 
 def root_mean_squared_error(y_true, y_pred):

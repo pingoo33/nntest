@@ -1,8 +1,7 @@
-import random
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import RobustScaler
-
+import random
 from data.interface.data_manager import DataManager
 from data.interface.mutant_callback import MutantCallback
 from data.interface.oracle import Oracle
@@ -37,15 +36,15 @@ class TemperatureData(DataManager):
         train_data = np.array(train_data)
         self.raw = train_data[:, 3:]
 
-        self.scaler = RobustScaler()
-        self.scaler.fit(self.raw)
-        normalize = self.scaler.transform(self.raw)
+        # self.scaler = RobustScaler()
+        # self.scaler.fit(self.raw)
+        # normalize = self.scaler.transform(self.raw)
+        #
+        # DF_data = normalize
+        # Adata_1 = np.array(DF_data)
 
-        DF_data = normalize
-        Adata_1 = np.array(DF_data)
-
-        raw_x = Adata_1
-        raw_y = Adata_1[:, -1:]
+        raw_x = self.raw
+        raw_y = self.raw[:, -1:]
 
         for j in range((len(raw_y) - n_seq)):
             _x = raw_x[j:j + n_seq]
@@ -68,21 +67,23 @@ class TemperatureData(DataManager):
     def mutant_data(self, data):
         random_idx = random.randrange(0, 12)
         selected_data = data[random_idx]
-        origin_data = self.scaler.inverse_transform(selected_data[np.newaxis, :])[0]
+        # origin_data = self.scaler.inverse_transform(selected_data[np.newaxis, :])[0]
+        #
+        # new_data = self.mutant_callback.mutant_data(origin_data)
+        new_data = self.mutant_callback.mutant_data(selected_data)
 
-        new_data = self.mutant_callback.mutant_data(origin_data)
-
-        normalized_new_data = self.normalize(new_data)
+        # normalized_new_data = self.normalize(new_data)
 
         new = np.array(data)
-        new[random_idx] = np.array(normalized_new_data)
+        # new[random_idx] = np.array(normalized_new_data)
+        new[random_idx] = np.array(new_data)
 
         return new, new_data
 
     def get_num_samples(self):
         return self.num_samples
 
-    def update_sample(self, src_label, dest_label, src, dest):
+    def update_sample(self, src_label, dest_label, src=None, dest=None):
         if abs(src_label - dest_label) > 0.09 and self.oracle.pass_oracle(src, dest):
             self.num_adv += 1
             self.advs.append(dest)
@@ -93,4 +94,5 @@ class TemperatureData(DataManager):
         return self.num_adv
 
     def save_advs(self):
-        pass
+        activations = pd.DataFrame(self.advs)
+        activations.to_csv('temperature_advs.csv', mode='w')

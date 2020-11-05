@@ -1,12 +1,11 @@
+from model.interface.model_manager import ModelManager
 import numpy as np
-
+import tensorflow.keras
 from tensorflow.keras.layers import Dense, Conv2D, BatchNormalization, Activation
 from tensorflow.keras.layers import AveragePooling2D, Input, Flatten
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras import Model
-
-from model.interface.model_manager import ModelManager
 
 
 class Resnet(ModelManager):
@@ -129,7 +128,7 @@ class Resnet(ModelManager):
     def kfold_train_model(self, fold_size, x_train, y_train, x_test, y_test):
         pass
 
-    def test_model(self):
+    def test_model(self, test_x, test_y):
         pass
 
     def get_intermediate_output(self, layer, data):

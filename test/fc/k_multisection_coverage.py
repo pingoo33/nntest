@@ -1,14 +1,13 @@
-import random
+from model.interface.model_manager import ModelManager
+from model.threshold_manager import ThresholdManager
+from test.interface.FCL_coverage import FCLCoverage
 import numpy as np
+import pandas as pd
 import matplotlib
 
 matplotlib.use('agg')
 from matplotlib import pyplot as plt
-from collections import defaultdict
-
-from model.interface.model_manager import ModelManager
-from model.threshold_manager import ThresholdManager
-from test.interface.FCL_coverage import FCLCoverage
+from matplotlib import cm
 
 
 class KMultisectionCoverage(FCLCoverage):
@@ -19,25 +18,30 @@ class KMultisectionCoverage(FCLCoverage):
         self.plt_y = []
         self.fr_plt_x = []
         self.fr_plt_y = [[]] * size
+        self.viridis = cm.get_cmap('viridis', size)
 
         self.layer = layer
         self.model_manager = model_manager
         self.threshold_manager = threshold_manager
 
-        self.covered_dicts = [defaultdict(bool)] * size
+        self.covered_dicts = []
         self.__init_covered_dict()
-        self.frequency_dicts = [defaultdict(int)] * size
+        self.frequency_dicts = []
         self.__init_frequency_dict()
 
     def __init_covered_dict(self):
-        for dict in self.covered_dicts:
+        for section in range(self.num_section):
+            temp = []
             for index in range(self.layer.output_shape[-1]):
-                dict[index] = False
+                temp.append(False)
+            self.covered_dicts.append(temp)
 
     def __init_frequency_dict(self):
-        for dict in self.frequency_dicts:
+        for section in range(self.num_section):
+            temp = []
             for index in range(self.layer.output_shape[-1]):
-                dict[index] = 0
+                temp.append(0)
+            self.frequency_dicts.append(temp)
 
     @staticmethod
     def calculate_variation(datas):
@@ -100,39 +104,36 @@ class KMultisectionCoverage(FCLCoverage):
                 temp.append(self.frequency_dicts[index][num_neuron])
             self.fr_plt_y[index] = temp
 
-    def display_graph(self):
+    def display_graph(self, name=''):
+        name = name + self.name
         plt.plot(self.plt_x, self.plt_y)
         plt.xlabel('# of generated samples')
         plt.ylabel('coverage')
         plt.title('K-Multisection Coverage of ' + self.layer.name)
-        plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_kc.png')
+        plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_' + name + '.png')
         plt.clf()
 
-    def display_frequency_graph(self):
-        n_groups = len(self.fr_plt_x)
-        index = np.arange(n_groups)
+    def display_frequency_graph(self, name=''):
+        name = name + self.name
+        self.fr_plt_y = np.array(self.fr_plt_y)
+        self.fr_plt_y = np.swapaxes(self.fr_plt_y, 0, 1)
+        df = pd.DataFrame(self.fr_plt_y)
 
-        plt.bar(index, self.fr_plt_y[0], align='center')
-        for i in range(1, self.num_section):
-            r = random.random()
-            g = random.random()
-            b = random.random()
-            a = random.random()
-            plt.bar(index, self.fr_plt_y[i], align='center', color=(r, g, b, a),
-                    bottom=self.fr_plt_y[i - 1])
-
-        plt.xlabel('features')
-        plt.ylabel('number of activation')
-        plt.title(self.layer.name + ' Frequency')
-        plt.xlim(-1, n_groups)
-        plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_kc_Frequency.png')
+        title = self.layer.name + ' Frequency of K-Multisection Coverage'
+        ax = df.plot(kind='bar', stacked=True, figsize=(10, 6), legend=False, title=title,
+                     xticks=([w for w in range(len(self.fr_plt_x)) if w % 10 == 0]))
+        ax.set_xlabel('neuron')
+        ax.set_ylabel('number of activation')
+        plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_' + name + '_Frequency.png')
         plt.clf()
 
-    def display_stat(self):
+    def display_stat(self, name=''):
+        _, coverage = self.calculate_coverage()
         mean, variation = self.calculate_variation(self.fr_plt_y)
 
-        f = open('output/%s_%s_tc.txt' % (self.model_manager.model_name, self.layer.name), 'w')
-        f.write('mean: %f' % mean)
+        f = open('output/%s/%s_%s_kmnc.txt' % (self.model_manager.model_name, name, self.layer.name), 'w')
+        f.write('coverage: %f\n' % coverage)
+        f.write('mean: %f\n' % mean)
         f.write('variation: %f' % variation)
         f.close()
 

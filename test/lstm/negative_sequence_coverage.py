@@ -1,16 +1,15 @@
-import itertools
+from collections import defaultdict
+from model.state_manager import StateManager
+from test.interface.RL_coverage import RLCoverage
 import numpy as np
-from saxpy.alphabet import cuts_for_asize
-from saxpy.sax import ts_to_string
-from saxpy.znorm import znorm
 import matplotlib
 
 matplotlib.use('agg')
 from matplotlib import pyplot as plt
-from collections import defaultdict
-
-from model.state_manager import StateManager
-from test.interface.RL_coverage import RLCoverage
+from saxpy.alphabet import cuts_for_asize
+from saxpy.sax import ts_to_string
+from saxpy.znorm import znorm
+import itertools
 
 
 class NegativeSequenceCoverage(RLCoverage):
@@ -21,8 +20,6 @@ class NegativeSequenceCoverage(RLCoverage):
         self.name = "NegativeSequenceCoverage"
         self.plt_x = []
         self.plt_y = []
-        self.fr_plt_x = []
-        self.fr_plt_y = []
 
         self.layer = layer
         self.model_name = model_name
@@ -33,9 +30,7 @@ class NegativeSequenceCoverage(RLCoverage):
         self.__init_feature()
 
         self.covered_dict = defaultdict(bool)
-        self.frequency_dict = defaultdict(int)
         self.__init_covered_dict()
-        self.__init_frequency_dict()
 
     def __init_feature(self):
         t1 = int(self.seq[0])
@@ -49,10 +44,6 @@ class NegativeSequenceCoverage(RLCoverage):
     def __init_covered_dict(self):
         for index in range(self.total_feature):
             self.covered_dict[index] = False
-
-    def __init_frequency_dict(self):
-        for index in range(self.total_feature):
-            self.frequency_dict[index] = 0
 
     def get_activation(self):
         hidden = self.hidden
@@ -78,7 +69,6 @@ class NegativeSequenceCoverage(RLCoverage):
         if feature in self.feature:
             index = self.feature.index(feature)
             self.covered_dict[index] = True
-            self.frequency_dict[index] += 1
 
     def update_graph(self, num_samples):
         _, coverage = self.calculate_coverage()
@@ -103,9 +93,7 @@ class NegativeSequenceCoverage(RLCoverage):
         return mean, variation
 
     def update_frequency_graph(self):
-        for index in range(self.total_feature):
-            self.fr_plt_x.append(index)
-            self.fr_plt_y.append(self.frequency_dict[index])
+        pass
 
     def display_graph(self):
         plt.plot(self.plt_x, self.plt_y)
@@ -116,24 +104,13 @@ class NegativeSequenceCoverage(RLCoverage):
         plt.clf()
 
     def display_frequency_graph(self):
-        n_groups = len(self.fr_plt_x)
-        index = np.arange(n_groups)
-
-        plt.bar(index, self.fr_plt_y, align='center')
-
-        plt.xlabel('features')
-        plt.ylabel('number of activation')
-        plt.title(self.layer.name + ' Frequency')
-        plt.xlim(-1, n_groups)
-        plt.savefig('output/' + self.model_name + '/' + self.layer.name + '_snc_Frequency.png')
-        plt.clf()
+        pass
 
     def display_stat(self):
-        mean, variation = self.calculate_variation(self.fr_plt_y)
+        _, coverage = self.calculate_coverage()
 
-        f = open('output/%s_%s_tc.txt' % (self.model_name, self.layer.name), 'w')
-        f.write('mean_n: %f' % mean)
-        f.write('variation_n: %f' % variation)
+        f = open('output/%s_%s_snc.txt' % (self.model_name, self.layer.name), 'w')
+        f.write('coverage: %f\n' % coverage)
         f.close()
 
     def get_name(self):

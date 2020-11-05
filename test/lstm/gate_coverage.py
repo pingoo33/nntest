@@ -1,13 +1,11 @@
+from model.state_manager import StateManager
+from test.interface.RL_coverage import RLCoverage
 import numpy as np
-import pandas as pd
 import matplotlib
-
 matplotlib.use('agg')
 from matplotlib import pyplot as plt
 from collections import defaultdict
-
-from model.state_manager import StateManager
-from test.interface.RL_coverage import RLCoverage
+import pandas as pd
 
 
 class GateCoverage(RLCoverage):
@@ -104,23 +102,24 @@ class GateCoverage(RLCoverage):
         plt.clf()
 
     def display_frequency_graph(self):
-        n_groups = len(self.fr_plt_x)
-        index = np.arange(n_groups)
+        self.fr_plt_y = np.array(self.fr_plt_y)
+        df = pd.DataFrame(self.fr_plt_y)
 
-        plt.bar(index, self.fr_plt_y, align='center')
-
-        plt.xlabel('features')
-        plt.ylabel('number of activation')
-        plt.title(self.layer.name + ' Frequency')
-        plt.xlim(-1, n_groups)
-        plt.savefig('output/' + self.model_name + '/' + self.layer.name + '_gc_Frequency.png')
+        title = self.layer.name + ' Frequency of Gate Coverage'
+        ax = df.plot(kind='bar', figsize=(10, 6), title=title,
+                     xticks=([w for w in range(len(self.fr_plt_x)) if w % 10 == 0]))
+        ax.set_xlabel('state')
+        ax.set_ylabel('number of activation')
+        plt.savefig('output/' + self.model_name + '/' + self.layer.name + '_cc_Frequency.png')
         plt.clf()
 
     def display_stat(self):
+        _, coverage = self.calculate_coverage()
         mean, variation = self.calculate_variation(self.fr_plt_y)
 
-        f = open('output/%s_%s_tc.txt' % (self.model_name, self.layer.name), 'w')
-        f.write('mean: %f' % mean)
+        f = open('output/%s_%s_gc.txt' % (self.model_name, self.layer.name), 'w')
+        f.write('coverage: %f\n' % coverage)
+        f.write('mean: %f\n' % mean)
         f.write('variation: %f' % variation)
         f.close()
 

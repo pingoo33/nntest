@@ -1,6 +1,6 @@
 import abc
-
 from tensorflow.keras import backend as K
+from .coverage import Coverage
 
 
 class FCLCoverage(metaclass=abc.ABCMeta):
@@ -30,15 +30,15 @@ class FCLCoverage(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def display_graph(self):
+    def display_graph(self, name):
         pass
 
     @abc.abstractmethod
-    def display_frequency_graph(self):
+    def display_frequency_graph(self, name):
         pass
 
     @abc.abstractmethod
-    def display_stat(self):
+    def display_stat(self, name):
         pass
 
     @abc.abstractmethod

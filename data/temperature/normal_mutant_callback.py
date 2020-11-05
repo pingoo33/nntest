@@ -1,7 +1,6 @@
-import numpy as np
-
 from data.interface.data_distribution_manager import DataDistribution
 from data.interface.mutant_callback import MutantCallback
+import numpy as np
 
 
 class NormalMutantCallback(MutantCallback):

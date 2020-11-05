@@ -1,4 +1,5 @@
 import numpy as np
+
 from sklearn.model_selection import KFold
 
 from tensorflow import keras
@@ -6,7 +7,7 @@ import tensorflow.keras.backend as K
 from tensorflow.keras import Model
 from tensorflow.keras.models import load_model
 from tensorflow.keras.optimizers import Adadelta
-from tensorflow.keras.layers import Dense, LSTM
+from tensorflow.keras.layers import Dense, LSTM, BatchNormalization
 
 from model.interface.model_manager import ModelManager
 
@@ -36,7 +37,7 @@ class Temperature(ModelManager):
         n_seq = 12
         n_input = 12
         n_output = 1
-        epochs = 200
+        epochs = 100
         batch_size = 32
 
         input_layer = keras.Input(shape=(n_seq, n_input))
@@ -44,7 +45,24 @@ class Temperature(ModelManager):
         lstm1 = LSTM(n_hidden, return_sequences=True)(input_layer)
         rnn_outputs = LSTM(n_hidden, activation='tanh')(lstm1)
 
-        outputs = Dense(n_output * 4)(rnn_outputs)
+        # outputs = Dense(n_output * 4)(rnn_outputs)
+        rnn_outputs = BatchNormalization()(rnn_outputs)
+        outputs = Dense(256)(rnn_outputs)
+        outputs = Dense(128)(outputs)
+        outputs = BatchNormalization()(outputs)
+        outputs = Dense(128)(outputs)
+        # outputs = BatchNormalization()(outputs)
+        outputs = Dense(128)(outputs)
+        outputs = Dense(128)(outputs)
+        outputs = Dense(128)(outputs)
+        outputs = BatchNormalization()(outputs)
+        outputs = Dense(128)(outputs)
+        # outputs = BatchNormalization()(outputs)
+        outputs = Dense(128)(outputs)
+        outputs = Dense(128)(outputs)
+        outputs = Dense(128)(outputs)
+        outputs = Dense(128)(outputs)
+        outputs = Dense(128)(outputs)
         outputs = Dense(n_output, activation='linear')(outputs)
 
         model = keras.Model(inputs=input_layer, outputs=outputs)
@@ -99,8 +117,8 @@ class Temperature(ModelManager):
         print("accuracy : %s" % str(acc))
         self.model.save('models/%s.h5' % self.model_name)
 
-    def test_model(self):
-        pass
+    def test_model(self, test_x, test_y):
+        return self.model.evaluate(test_x, test_y)[1]
 
     def get_layer(self, index):
         return self.model.layers[index]
@@ -134,7 +152,7 @@ class Temperature(ModelManager):
                     or 'flatten' in layer.name:
                 continue
             layer_type = self.__get_layer_type(layer.name)
-            if layer_type != "lstm":
+            if layer_type == "dense":
                 layers.append(layer)
                 indices.append(index)
         return indices, layers
