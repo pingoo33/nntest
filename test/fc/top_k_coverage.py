@@ -10,6 +10,9 @@ from matplotlib import pyplot as plt
 
 
 class TopKCoverage(FCLCoverage):
+    def save_feature(self):
+        pass
+
     def __init__(self, layer, model_manager: ModelManager, size):
         if layer.output_shape[-1] < size:
             self.size = layer.output_shape[-1]

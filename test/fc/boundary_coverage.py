@@ -12,6 +12,9 @@ from matplotlib import pyplot as plt
 
 
 class BoundaryCoverage(FCLCoverage):
+    def save_feature(self):
+        pass
+
     def __init__(self, layer, model_manager: ModelManager, threshold_manager: ThresholdManager):
         self.name = "BoundaryCoverage"
         self.plt_x = []

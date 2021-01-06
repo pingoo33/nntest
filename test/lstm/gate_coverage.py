@@ -7,6 +7,9 @@ from matplotlib import pyplot as plt
 from collections import defaultdict
 import pandas as pd
 
+from model.state_manager import StateManager
+from test.interface.RL_coverage import RLCoverage
+
 
 class GateCoverage(RLCoverage):
 

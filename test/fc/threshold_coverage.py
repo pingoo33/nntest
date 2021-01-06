@@ -11,6 +11,11 @@ from matplotlib import pyplot as plt
 
 
 class ThresholdCoverage(FCLCoverage):
+    def save_feature(self):
+        activations = pd.DataFrame(self.activates)
+        activations.to_csv('output/' + self.model_manager.model_name + '/' + self.layer.name + '_cc_activates.csv',
+                           mode='w')
+
     def __init__(self, layer, model_manager: ModelManager, threshold=0):
         self.name = "ThresholdCoverage"
         self.plt_x = []
@@ -21,6 +26,8 @@ class ThresholdCoverage(FCLCoverage):
         self.layer = layer
         self.model_manager = model_manager
         self.threshold = threshold
+
+        self.activates = []
 
         self.covered_dict = defaultdict(bool)
         self.__init_covered_dict()
@@ -47,7 +54,9 @@ class ThresholdCoverage(FCLCoverage):
     def update_features(self, data):
         inter_output = self.model_manager.get_intermediate_output(self.layer, data)
         for num_neuron in range(inter_output.shape[-1]):
-            if np.mean(inter_output[..., num_neuron]) > self.threshold:
+            activate = np.mean(inter_output[..., num_neuron])
+            self.activates.append(activate)
+            if activate > self.threshold:
                 self.covered_dict[num_neuron] = True
                 self.frequency_dict[num_neuron] += 1
 

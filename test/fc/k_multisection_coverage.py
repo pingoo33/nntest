@@ -11,6 +11,9 @@ from matplotlib import cm
 
 
 class KMultisectionCoverage(FCLCoverage):
+    def save_feature(self):
+        pass
+
     def __init__(self, layer, model_manager: ModelManager, threshold_manager: ThresholdManager, size):
         self.name = "KMultisectionCoverage"
         self.num_section = size

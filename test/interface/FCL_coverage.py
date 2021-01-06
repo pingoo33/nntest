@@ -44,3 +44,11 @@ class FCLCoverage(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def get_name(self):
         pass
+
+    @abc.abstractmethod
+    def save_feature(self):
+        pass
+
+    @abc.abstractmethod
+    def get_name(self):
+        pass

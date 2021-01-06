@@ -24,6 +24,8 @@ class TestNN:
 
         self.target_data = self.data_manager.x_train[random.sample(range(np.shape(self.data_manager.x_train)[0]), seed)]
 
+        self.target_data = self.data_manager.x_train[random.sample(range(np.shape(self.data_manager.x_train)[0]), seed)]
+
     def kfold_train(self, fold_size):
         (x_train, y_train) = self.data_manager.get_train_data()
         (x_test, y_test) = self.data_manager.get_test_data()
@@ -51,7 +53,7 @@ class TestNN:
             pbar.set_description("samples: %d, advs: %d"
                                  % (self.data_manager.get_num_samples(), self.data_manager.get_num_advs()))
         for coverage in coverage_set:
-            # coverage.save_feature()
+            coverage.save_feature()
             coverage.update_frequency_graph()
             coverage.display_graph()
             coverage.display_frequency_graph()
@@ -86,10 +88,10 @@ class TestNN:
 
         for layer in other_layers:
             threshold_manager = ThresholdManager(self.model_manager, layer, self.data_manager.x_train)
-            #coverage_set = [ThresholdCoverage(layer, self.model_manager, threshold_tc),
-            #                KMultisectionCoverage(layer, self.model_manager, threshold_manager, sec_kmnc),
-            #                BoundaryCoverage(layer, self.model_manager, threshold_manager),
-            #                TopKCoverage(layer, self.model_manager, size_tkc)]
+            # coverage_set = [ThresholdCoverage(layer, self.model_manager, threshold_tc),
+            #                 KMultisectionCoverage(layer, self.model_manager, threshold_manager, sec_kmnc),
+            #                 BoundaryCoverage(layer, self.model_manager, threshold_manager),
+            #                 TopKCoverage(layer, self.model_manager, size_tkc)]
             coverage_set = [ThresholdCoverage(layer, self.model_manager, threshold_tc)]
 
             self.__mutant_data_process(coverage_set, self.target_data)
