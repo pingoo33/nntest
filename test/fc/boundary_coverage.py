@@ -11,12 +11,12 @@ matplotlib.use('agg')
 from matplotlib import pyplot as plt
 
 
-class BoundaryCoverage(FCLCoverage):
+class NeuronBoundaryCoverage(FCLCoverage):
     def save_feature(self):
         pass
 
     def __init__(self, layer, model_manager: ModelManager, threshold_manager: ThresholdManager):
-        self.name = "BoundaryCoverage"
+        self.name = "NeuronBoundaryCoverage"
         self.plt_x = []
         self.plt_y = []
         self.fr_plt_x = []
@@ -102,7 +102,7 @@ class BoundaryCoverage(FCLCoverage):
         plt.plot(self.plt_x, self.plt_y)
         plt.xlabel('# of generated samples')
         plt.ylabel('coverage')
-        plt.title('Boundary Coverage of ' + self.layer.name)
+        plt.title('Neuron Boundary Coverage of ' + self.layer.name)
         plt.savefig('output/' + self.model_manager.model_name + '/' + self.layer.name + '_' + name + '.png')
         plt.clf()
 
@@ -114,7 +114,7 @@ class BoundaryCoverage(FCLCoverage):
         }
         df = pd.DataFrame(data)
 
-        title = self.layer.name + ' Frequency of Boundary Coverage'
+        title = self.layer.name + ' Frequency of Neuron Boundary Coverage'
         ax = df.plot(kind='bar', stacked=True, figsize=(10, 6), title=title,
                      xticks=([w for w in range(len(self.fr_plt_x)) if w % 10 == 0]))
         ax.set_xlabel('neuron')

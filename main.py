@@ -30,8 +30,8 @@ def main():
     parser.add_argument('--seed', dest='seed_num', default='2000', help='')
     parser.add_argument('--threshold_nc', dest='threshold_tc', default='0', help='')
     parser.add_argument('--sec_kmnc', dest='sec_kmnc', default='1', help='')
-    parser.add_argument('--threshold_cc', dest='threshold_cc', default='5', help='')
-    parser.add_argument('--threshold_gc', dest='threshold_gc', default='0.705', help='')
+    parser.add_argument('--threshold_bc', dest='threshold_bc', default='5', help='')
+    parser.add_argument('--threshold_sc', dest='threshold_sc', default='0.705', help='')
     parser.add_argument('--symbols_sq', dest='symbols_sq', default='2', help='')
     parser.add_argument('--seq', dest='seq', default='[7,11]', help='')
     parser.add_argument('--size_tkc', dest='size_tkc', default='1', help='')
@@ -45,8 +45,8 @@ def main():
     seed = int(args.seed_num)
     threshold_tc = int(args.threshold_tc)
     sec_kmnc = int(args.sec_kmnc)
-    threshold_cc = float(args.threshold_cc)
-    threshold_gc = float(args.threshold_gc)
+    threshold_bc = float(args.threshold_bc)
+    threshold_sc = float(args.threshold_sc)
     symbols_sq = int(args.symbols_sq)
     seq = args.seq
     seq = re.findall(r"\d+\.?\d*", seq)
@@ -133,7 +133,7 @@ def main():
         else:
             test.train()
     elif mode == 'test_lstm':
-        test.lstm_test(threshold_cc, threshold_gc, symbols_sq, seq)
+        test.lstm_test(threshold_bc, threshold_sc, symbols_sq, seq)
     elif mode == 'test_fc':
         test.fc_test(threshold_tc, sec_kmnc, size_tkc)
     elif mode == 'test_pattern':

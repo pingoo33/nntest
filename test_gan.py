@@ -6,7 +6,7 @@ from tensorflow.keras.preprocessing import image
 from data.interface.data_manager import DataManager
 from model.interface.model_manager import ModelManager
 from model.threshold_manager import ThresholdManager
-from test.fc.boundary_coverage import BoundaryCoverage
+from test.fc.boundary_coverage import NeuronBoundaryCoverage
 from test.fc.k_multisection_coverage import KMultisectionCoverage
 from test.fc.threshold_coverage import ThresholdCoverage
 from test.fc.top_k_coverage import TopKCoverage
@@ -86,7 +86,7 @@ class TestGAN:
             for i in range(len(self.dir_list)):
                 coverage_set = [ThresholdCoverage(layer, self.model_manager, threshold_tc),
                                 KMultisectionCoverage(layer, self.model_manager, threshold_manager, sec_kmnc),
-                                BoundaryCoverage(layer, self.model_manager, threshold_manager),
+                                NeuronBoundaryCoverage(layer, self.model_manager, threshold_manager),
                                 TopKCoverage(layer, self.model_manager, size_tkc)]
                 # coverage_set = [KMultisectionCoverage(layer, self.model_manager, threshold_manager, sec_kmnc)]
 

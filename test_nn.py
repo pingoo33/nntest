@@ -6,7 +6,8 @@ from data.interface.data_manager import DataManager
 from model.interface.model_manager import ModelManager
 from model.state_manager import StateManager
 from model.threshold_manager import ThresholdManager
-from test.fc.boundary_coverage import BoundaryCoverage
+from test.fc.boundary_coverage import NeuronBoundaryCoverage
+from test.lstm.boundary_coverage import BoundaryCoverage
 from test.lstm.cell_coverage import CellCoverage
 from test.lstm.gate_coverage import GateCoverage
 from test.fc.k_multisection_coverage import KMultisectionCoverage
@@ -15,6 +16,8 @@ from test.fc.top_k_coverage import TopKCoverage
 from test.fc_pattern.top_k_pattern_coverage import TopKPatternCoverage
 from test.lstm.negative_sequence_coverage import NegativeSequenceCoverage
 from test.lstm.positive_sequence_coverage import PositiveSequenceCoverage
+from test.lstm.stepwise_coverage import StepWiseCoverage
+from test.lstm.temporal_coverage import TemporalCoverage
 
 
 class TestNN:
@@ -63,7 +66,7 @@ class TestNN:
             _, result = coverage.calculate_coverage()
             print("%s : %.5f" % (coverage.get_name(), result))
 
-    def lstm_test(self, threshold_cc, threshold_gc, symbols_sq, seq):
+    def lstm_test(self, threshold_bc, threshold_sc, symbols_sq, seq):
         self.model_manager.load_model()
         model = self.model_manager.model
         model_name = self.model_manager.model_name
@@ -73,10 +76,16 @@ class TestNN:
         init_data = self.target_data[15]
         layer = lstm_layers[-1]
         state_manager = StateManager(model, indices[-1])
-        coverage_set = [CellCoverage(layer, model_name, state_manager, threshold_cc, init_data),
-                        GateCoverage(layer, model_name, state_manager, threshold_gc, init_data),
-                        PositiveSequenceCoverage(layer, model_name, state_manager, symbols_sq, seq),
-                        NegativeSequenceCoverage(layer, model_name, state_manager, symbols_sq, seq)]
+
+        mean_TC, std_TC, max_SC, min_SC, max_BC, min_BC = state_manager.aggregate_inf(self.target_data, seq)
+
+        coverage_set = [BoundaryCoverage(layer, model_name, state_manager, threshold_bc, min_BC, max_BC, init_data),
+                        StepWiseCoverage(layer, model_name, state_manager, threshold_sc, min_SC, max_SC, init_data),
+                        TemporalCoverage(layer, model_name, state_manager, symbols_sq, seq, mean_TC, std_TC)]
+        # coverage_set = [CellCoverage(layer, model_name, state_manager, threshold_cc, init_data),
+        #                 GateCoverage(layer, model_name, state_manager, threshold_gc, init_data),
+        #                 PositiveSequenceCoverage(layer, model_name, state_manager, symbols_sq, seq),
+        #                 NegativeSequenceCoverage(layer, model_name, state_manager, symbols_sq, seq)]
         # coverage_set = [CellCoverage(layer, model_name, state_manager, threshold_cc, init_data),
         #                 GateCoverage(layer, model_name, state_manager, threshold_gc, init_data)]
 
@@ -90,7 +99,7 @@ class TestNN:
             threshold_manager = ThresholdManager(self.model_manager, layer, self.data_manager.x_train)
             # coverage_set = [ThresholdCoverage(layer, self.model_manager, threshold_tc),
             #                 KMultisectionCoverage(layer, self.model_manager, threshold_manager, sec_kmnc),
-            #                 BoundaryCoverage(layer, self.model_manager, threshold_manager),
+            #                 NeuronBoundaryCoverage(layer, self.model_manager, threshold_manager),
             #                 TopKCoverage(layer, self.model_manager, size_tkc)]
             coverage_set = [ThresholdCoverage(layer, self.model_manager, threshold_tc)]
 
