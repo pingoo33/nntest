@@ -1,15 +1,15 @@
 import numpy as np
 
+from data.interface.oracle import Oracle
 
-class Oracle:
-    def __init__(self, input, lp, radius):
-        self.input = input
-        self.measurement = lp
+
+class NormalOracle(Oracle):
+    def __init__(self, radius):
         self.radius = radius
 
-    def pass_oracle(self, test):
-        n = np.count_nonzero(self.input - test)
-        return np.linalg.norm(self.input - test, ord=self.measurement) / float(n) <= self.radius
+    def pass_oracle(self, src, dest):
+        n = np.count_nonzero(src - dest)
+        return np.linalg.norm(src - dest, ord=2) / float(n) <= self.radius
 
-    def measure(self, test):
-        return np.linalg.norm(self.input - test, ord=self.measurement)
+    def measure(self, src, dest):
+        return np.linalg.norm(src - dest, ord=2)

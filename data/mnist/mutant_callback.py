@@ -14,36 +14,24 @@ class MnistMutantCallback(MutantCallback):
         self.model_manager = model_manager
 
     def mutant_data(self, data):
-        f, nodes_names = self.model_manager.get_gradients_function()
-
         epsilon = random.uniform(0.05, 1)
         step = 2
-        last_activation = self.model_manager.get_prob(data)
+        new_data = data
 
-        return self.get_next_input_by_gradient(f, nodes_names, epsilon, data, last_activation, step)
+        for s in range(step):
+            last_activation = self.model_manager.get_prob(new_data)
+            gradients = self.model_manager.get_gradients(np.array([new_data]), np.array([last_activation]))
 
-    def get_next_input_by_gradient(self, f, nodes_names, epsilon, data, last_activation, step):
-        gd = self.model_manager.cal_gradient(f, np.array([data]), np.array([last_activation]), nodes_names)
-        gd = np.squeeze(list(gd.values())[0])
-        if np.shape(data) != np.shape(gd):
-            step = step - 1
-            if step <= 0:
-                print("found a test case of shape %s!" % (str(data.shape)))
-                return data
-            else:
-                return self.get_next_input_by_gradient(f, nodes_names, epsilon, data, last_activation, step)
+            if np.shape(new_data) != np.shape(gradients):
+                continue
 
-        new_test = data + epsilon * np.sign(gd)
-        new_test = np.clip(new_test, 0, 1)
-        last_activation = self.model_manager.get_prob(data)
-        step = step - 1
+            temp = new_data + epsilon * np.sign(gradients)
+            temp = np.clip(temp, 0, 1)
 
-        if np.array_equal(data, new_test):
-            print("Gradients are too small")
-            print("-----------------------------------------------------")
-            return None
-        elif step <= 0:
-            print("found a test case of shape %s!" % (str(new_test.shape)))
-            return new_test
-        else:
-            return self.get_next_input_by_gradient(f, nodes_names, epsilon, new_test, last_activation, step)
+            if np.array_equal(temp, new_data):
+                print('Gradients are too small')
+                return None
+
+            new_data = temp
+
+        return new_data

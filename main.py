@@ -10,18 +10,25 @@ from data.cifar10.mutant_callback import Cifar10MutantCallback
 from data.mnist.data import MnistData
 from data.mnist.data_cnn import MnistCNNData
 from data.mnist.mutant_callback import MnistMutantCallback
+from data.oracle import NormalOracle
 from data.oracle_einsum import OracleEinsum
 from model.atomic import Atomic
 from model.cifar10 import Cifar10
+from model.interface.train_option import TrainOption
 from model.mnist import Mnist
 from model.mnist_cnn import MnistCNN
-from model.resnet import Resnet
+from model.model_manager import ModelManagerImpl
 from test_gan import TestGAN
 from test_nn import *
 from model.temperature import Temperature
 from data.temperature.normal_mutant_callback import NormalMutantCallback
 from data.temperature.data import TemperatureData
 from data.temperature.distribution import TemperatureDistribution
+
+import tensorflow as tf
+tf.compat.v1.disable_eager_execution()
+from tensorflow.keras.optimizers import Adadelta, Adam, RMSprop
+from tensorflow.keras.metrics import RootMeanSquaredError
 
 
 def main():
@@ -78,18 +85,42 @@ def main():
         mutant_callback = NormalMutantCallback(data_distribution)
         oracle = OracleEinsum(radius)
         data_manager = TemperatureData(mutant_callback, oracle)
-        model_manager = Temperature(model_name)
+        model = Temperature().get_model()
+
+        t_opt = TrainOption(
+            epochs=100, batch_size=32,
+            opt=Adadelta(lr=0.001),
+            loss='mean_squared_error',
+            metrics=[RootMeanSquaredError()]
+        )
+        model_manager = ModelManagerImpl(model, model_name, t_opt)
 
         test = TestNN(data_manager, model_manager, seed)
     elif 'mnist_cnn' in model_name:
-        model_manager = MnistCNN(model_name)
+        model = MnistCNN().get_model()
+
+        t_opt = TrainOption(
+            epochs=12, batch_size=32,
+            opt=Adadelta(),
+            loss='categorical_crossentropy',
+            metrics=['accuracy']
+        )
+        model_manager = ModelManagerImpl(model, model_name, t_opt)
         mutant_callback = MnistMutantCallback(model_manager)
-        oracle = OracleEinsum(radius)
+        oracle = NormalOracle(radius)
         data_manager = MnistCNNData(mutant_callback, oracle)
 
         test = TestNN(data_manager, model_manager, seed)
     elif 'mnist' in model_name:
-        model_manager = Mnist(model_name)
+        model = Mnist().get_model()
+
+        t_opt = TrainOption(
+            epochs=3, batch_size=32,
+            opt=Adam(lr=1e-3, decay=1e-5),
+            loss='categorical_crossentropy',
+            metrics=['accuracy']
+        )
+        model_manager = ModelManagerImpl(model, model_name, t_opt)
         mutant_callback = MnistMutantCallback(model_manager)
         oracle = OracleEinsum(radius)
         data_manager = MnistData(mutant_callback, oracle)
@@ -98,7 +129,14 @@ def main():
     elif 'atomic' in model_name:
         radius = 6.66128
 
-        model_manager = Atomic(model_name)
+        model = Atomic().get_model()
+        t_opt = TrainOption(
+            epochs=100, batch_size=32,
+            opt=Adadelta(lr=0.001),
+            loss='mean_squared_error',
+            metrics=[RootMeanSquaredError()]
+        )
+        model_manager = ModelManagerImpl(model, model_name, t_opt)
         data_distribution = AtomicDistribution()
         mutant_callback = AtomicMutantCallback(data_distribution)
         oracle = OracleEinsum(radius)
@@ -106,21 +144,28 @@ def main():
 
         test = TestNN(data_manager, model_manager, seed)
     elif 'cifar10' in model_name:
-        model_manager = Cifar10(model_name)
-        mutant_callback = Cifar10MutantCallback(model_manager)
-        oracle = OracleEinsum(radius)
-        data_manager = Cifar10Data(mutant_callback, oracle)
-
-        test = TestNN(data_manager, model_manager, seed)
-    elif 'resnet' in model_name:
-        model_manager = Resnet(model_name)
+        model = Cifar10().get_model()
+        t_opt = TrainOption(
+            epochs=100, batch_size=32,
+            opt=RMSprop(lr=0.0001, decay=1e-6),
+            loss='categorical_crossentropy',
+            metrics=['accuracy']
+        )
+        model_manager = ModelManagerImpl(model, model_name, t_opt)
         mutant_callback = Cifar10MutantCallback(model_manager)
         oracle = OracleEinsum(radius)
         data_manager = Cifar10Data(mutant_callback, oracle)
 
         test = TestNN(data_manager, model_manager, seed)
     elif 'test_gan' in model_name:
-        model_manager = MnistCNN('mnist_cnn')
+        model = MnistCNN().get_model()
+        t_opt = TrainOption(
+            epochs=12, batch_size=32,
+            opt=Adadelta(),
+            loss='categorical_crossentropy',
+            metrics=['accuracy']
+        )
+        model_manager = ModelManagerImpl(model, 'mnist_cnn', t_opt)
         mutant_callback = MnistMutantCallback(model_manager)
         oracle = OracleEinsum(radius)
         data_manager = MnistCNNData(mutant_callback, oracle)

@@ -68,8 +68,6 @@ class BoundaryCoverage(RLCoverage):
         self.hidden = self.state_manager.get_hidden_state([data])
         activation = self.get_activation()
         activation = (activation - self.min) / (self.max - self.min)
-        print(activation)
-        print(self.avg)
         fitness = np.min((self.avg - activation), axis=0)
 
         features = (np.argwhere(fitness <= 0)).tolist()

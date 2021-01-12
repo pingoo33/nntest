@@ -1,3 +1,4 @@
+import tensorflow as tf
 from tensorflow.keras.datasets import mnist
 from tensorflow.keras.utils import to_categorical
 
@@ -40,7 +41,9 @@ class MnistData(DataManager):
         return self.num_samples
 
     def update_sample(self, src_label, dest_label, src=None, dest=None):
-        if src_label != dest_label and self.oracle.pass_oracle(src, dest):
+        src_label = tf.argmax(src_label)
+        dest_label = tf.argmax(dest_label)
+        if src_label != dest_label and self.oracle.pass_oracle(src[0], dest[0]):
             self.num_adv += 1
             self.advs.append(dest)
 

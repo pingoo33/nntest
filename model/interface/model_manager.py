@@ -1,27 +1,22 @@
 import abc
-import tensorflow.keras.backend as K
+from tensorflow.keras import Sequential
+
+from model.interface.train_option import TrainOption
 
 
 class ModelManager(metaclass=abc.ABCMeta):
-    def __init__(self, model_name):
-        self.model = None
+    def __init__(self, model: Sequential, model_name, train_opt: TrainOption):
+        self.model = model
         self.model_name = model_name
+        self.train_opt = train_opt
 
-    def get_gradients_function(self, layer_name=None):
-        nodes = [layer.input for layer in self.model.layers if layer.name == layer_name or layer_name is None]
-        nodes_names = [n.name for n in nodes]
-        if self.model.optimizer is None:
-            raise Exception('Please compile the model first. The loss function is required to compute the gradients.')
-        grads = self.model.optimizer.get_gradients(self.model.total_loss, nodes)
-        symb_inputs = (self.model._feed_inputs + self.model._feed_targets + self.model._feed_sample_weights)
-        f = K.function(symb_inputs, grads)
-        return f, nodes_names
+    @abc.abstractmethod
+    def get_gradients(self, x, y=None, layer_name=None):
+        pass
 
-    def cal_gradient(self, f, x, y, nodes_names):
-        x_, y_, sample_weight_ = self.model._standardize_user_data(x, y)
-        gradients_values = f(x_ + y_ + sample_weight_)
-        result = dict(zip(nodes_names, gradients_values))
-        return result
+    @abc.abstractmethod
+    def get_activations(self, x, layer_name=None):
+        pass
 
     @abc.abstractmethod
     def get_layer(self, index):

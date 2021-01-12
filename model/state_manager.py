@@ -3,10 +3,12 @@ from tensorflow.keras.models import Model
 import keras.backend as K
 from tensorflow.keras.layers import Input, LSTM
 
+from model.interface.model_manager import ModelManager
+
 
 class StateManager:
-    def __init__(self, model: Model, layer_index):
-        self.model = model
+    def __init__(self, model_manager: ModelManager, layer_index):
+        self.model_manager = model_manager
         self.layer_index = layer_index
 
     def aggregate_inf(self, data_set, seq):
@@ -35,27 +37,6 @@ class StateManager:
 
         return mean_TC, std_TC, max_SC, min_SC, max_BC, min_BC
 
-    def __evaluate(self, nodes_to_evaluate, x, y=None):
-        symb_inputs = self.model._feed_inputs
-        f = K.function(symb_inputs, nodes_to_evaluate)
-        x_ = [np.array(x)]
-        if y is None:
-            y = []
-        return f(x_ + y)
-
-    def __get_activations_single_layer(self, x, layer_name=None):
-        nodes = [layer.output for layer in self.model.layers if
-                 layer.name == layer_name or layer_name is None]
-        # we process the placeholders later (Inputs node in Keras). Because there's a bug in Tensorflow.
-        input_layer_outputs, layer_outputs = [], []
-        [input_layer_outputs.append(node) if 'input_' in node.name else layer_outputs.append(node) for node in nodes]
-        activations = self.__evaluate(layer_outputs, x)
-        activations_dict = dict(zip([output.name for output in layer_outputs], activations))
-        activations_inputs_dict = dict(zip([output.name for output in input_layer_outputs], x))
-        result = activations_inputs_dict.copy()
-        result.update(activations_dict)
-        return np.squeeze(list(result.values())[0])
-
     @staticmethod
     def __hard_sigmoid(x):
         return np.maximum(0, np.minimum(1, 0.2 * x + 0.5))
@@ -64,14 +45,17 @@ class StateManager:
         if layer_num == 0:
             acx = test
         else:
-            acx = self.__get_activations_single_layer(np.array(test), self.model.layers[layer_num - 1].name)
+            acx = self.model_manager.get_activations(np.array(test),
+                                                     layer_name=self.model_manager.model.layers[layer_num - 1].name)
 
-        units = int(int(self.model.layers[layer_num].trainable_weights[0].shape[1]) / 4)
+        units = int(int(self.model_manager.model.layers[layer_num].trainable_weights[0].shape[1]) / 4)
 
         if len(np.shape(acx)) < len(np.shape(test)):
             acx = np.array([acx])
+        elif len(np.shape(acx)) > len(np.shape(test)):
+            acx = acx[0]
 
-        inp = Input(batch_shape=(None, acx.shape[1], acx.shape[2]), name="input")
+        inp = Input(batch_shape=(None, acx.shape[-2], acx.shape[-1]), name="input")
         rnn, s, c = LSTM(units,
                          return_sequences=True,
                          stateful=False,
@@ -81,7 +65,7 @@ class StateManager:
 
         for layer in states.layers:
             if layer.name == "RNN":
-                layer.set_weights(self.model.layers[layer_num].get_weights())
+                layer.set_weights(self.model_manager.model.layers[layer_num].get_weights())
 
         h_t, c_t, rnn = states.predict(acx)
 
@@ -89,3 +73,4 @@ class StateManager:
 
     def get_hidden_state(self, data):
         return self.cal_hidden_keras(data, self.layer_index)
+
