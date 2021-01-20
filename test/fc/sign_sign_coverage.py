@@ -146,7 +146,7 @@ class SignSignCoverage(FCLCoverage):
     def display_stat(self, name):
         _, coverage = self.calculate_coverage()
         mean, variation = self.calculate_variation(self.fr_plt_y)
-
+        
         f = open('output/%s/%s_%s_ssc.txt' % (self.model_manager.model_name, name, self.first.name), 'w')
         f.write('coverage: %f\n' % coverage)
         f.write('mean: %f\n' % mean)
