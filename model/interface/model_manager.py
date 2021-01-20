@@ -53,3 +53,7 @@ class ModelManager(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def get_fc_layer(self):
         pass
+
+    @abc.abstractmethod
+    def get_continuous_fc_layer(self):
+        pass

@@ -94,7 +94,6 @@ class ModelManagerImpl(ModelManager):
         return indices, layers
 
     def get_fc_layer(self):
-        indices = []
         layers = []
         for index, layer in enumerate(self.model.layers):
             if 'input' in layer.name \
@@ -103,10 +102,23 @@ class ModelManagerImpl(ModelManager):
                     or 'flatten' in layer.name:
                 continue
             layer_type = self.__get_layer_type(layer.name)
-            if layer_type != "lstm":
+            if layer_type == "dense":
                 layers.append(layer)
-                indices.append(index)
-        return indices, layers
+        return layers
+
+    def get_continuous_fc_layer(self):
+        layers = []
+        for index in range(len(self.model.layers)):
+            if 'input' in self.model.layers[index].name \
+                    or 'concatenate' in self.model.layers[index].name \
+                    or index >= len(self.model.layers) - 2 \
+                    or 'flatten' in self.model.layers[index].name:
+                continue
+            layer_before_type = self.__get_layer_type(self.model.layers[index].name)
+            layer_after_type = self.__get_layer_type(self.model.layers[index + 1].name)
+            if layer_before_type == "dense" and layer_after_type == "dense":
+                layers.append([self.model.layers[index], self.model.layers[index + 1]])
+        return layers
 
     @staticmethod
     def __get_layer_type(layer_name):
